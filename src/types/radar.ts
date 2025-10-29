@@ -7,6 +7,8 @@ export interface RadarLocation {
   state: string;
   baseId: string; // Base radar ID like "66" for Brisbane
   productId: string; // Full product ID like "IDR713" (default 128km range)
+  lat: number; // Latitude for proximity calculations
+  lng: number; // Longitude for proximity calculations
 }
 
 export interface RadarImage {
