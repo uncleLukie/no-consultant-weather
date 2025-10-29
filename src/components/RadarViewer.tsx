@@ -81,6 +81,10 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
     setCurrentIndex((prev) => (prev + 1) % images.length);
   }, [images.length]);
 
+  const handleLatest = useCallback(() => {
+    setCurrentIndex(images.length - 1);
+  }, [images.length]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -110,9 +114,9 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
   const transparencyBaseUrl = `https://reg.bom.gov.au/products/radar_transparencies/${currentProductId}`;
 
   return (
-    <div className="w-full max-w-6xl mx-auto">
+    <div className="h-full flex flex-col">
       {/* Compact Controls Bar */}
-      <div className="mb-3 p-2 bg-white rounded shadow-sm border border-gray-200">
+      <div className="mb-2 p-2 bg-white rounded shadow-sm border border-gray-200">
         <div className="flex items-center justify-between gap-4 flex-wrap text-xs">
           {/* Range Selector */}
           <div className="flex items-center gap-2">
@@ -185,13 +189,13 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
       </div>
 
       {/* Radar Image with Overlays */}
-      <div className="bg-gray-100 rounded-lg overflow-hidden shadow-lg relative">
+      <div className="flex-1 min-h-0 bg-gray-100 rounded-lg overflow-hidden shadow-lg relative">
         {/* Base layers - UNDER the radar image */}
         {overlays.background && (
           <img
             src={`${transparencyBaseUrl}.background.png`}
             alt="Background overlay"
-            className="absolute inset-0 w-full h-full pointer-events-none"
+            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
             style={{ zIndex: 1 }}
           />
         )}
@@ -199,7 +203,7 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
           <img
             src={`${transparencyBaseUrl}.topography.png`}
             alt="Topography overlay"
-            className="absolute inset-0 w-full h-full pointer-events-none"
+            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
             style={{ zIndex: 2 }}
           />
         )}
@@ -207,7 +211,7 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
           <img
             src={`${transparencyBaseUrl}.catchments.png`}
             alt="Catchments overlay"
-            className="absolute inset-0 w-full h-full pointer-events-none"
+            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
             style={{ zIndex: 3 }}
           />
         )}
@@ -216,7 +220,7 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
         <img
           src={currentImage.url}
           alt={`Radar loop frame ${currentIndex + 1}`}
-          className="w-full h-auto block relative"
+          className="w-full h-full object-contain block relative"
           style={{ zIndex: 4 }}
         />
 
@@ -225,7 +229,7 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
           <img
             src={`${transparencyBaseUrl}.range.png`}
             alt="Range rings overlay"
-            className="absolute inset-0 w-full h-full pointer-events-none"
+            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
             style={{ zIndex: 5 }}
           />
         )}
@@ -233,14 +237,14 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
           <img
             src={`${transparencyBaseUrl}.locations.png`}
             alt="Locations overlay"
-            className="absolute inset-0 w-full h-full pointer-events-none"
+            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
             style={{ zIndex: 6 }}
           />
         )}
       </div>
 
       {/* Compact Playback Controls */}
-      <div className="mt-3 flex items-center justify-center gap-3 text-sm">
+      <div className="mt-2 flex items-center justify-center gap-2 text-sm">
         <button
           onClick={handlePrevious}
           className="px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-xs"
@@ -262,6 +266,14 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
           disabled={images.length <= 1}
         >
           Next ▶
+        </button>
+
+        <button
+          onClick={handleLatest}
+          className="px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 transition text-xs"
+          disabled={images.length <= 1 || currentIndex === images.length - 1}
+        >
+          Latest
         </button>
 
         <span className="text-xs text-gray-600 ml-2">
