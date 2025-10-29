@@ -1,0 +1,19 @@
+{
+  "name": "no-consultant-weather-api",
+  "version": "1.0.0",
+  "description": "Proxy API for No-Consultant Weather",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "node-fetch": "^3.3.2"
+  }
+}
