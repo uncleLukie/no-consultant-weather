@@ -4,9 +4,10 @@ import { fetchRadarImages, formatTimestamp } from '../utils/radarApi';
 
 interface RadarViewerProps {
   baseId: string;
+  isDarkMode: boolean;
 }
 
-export function RadarViewer({ baseId }: RadarViewerProps) {
+export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
   const [selectedRange, setSelectedRange] = useState<RadarRange>('128');
   const [images, setImages] = useState<RadarImage[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -88,7 +89,7 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-xl text-gray-600">Loading radar data...</div>
+        <div className={`text-xl ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Loading radar data...</div>
       </div>
     );
   }
@@ -104,7 +105,7 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
   if (images.length === 0) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-xl text-gray-600">No radar data available</div>
+        <div className={`text-xl ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>No radar data available</div>
       </div>
     );
   }
@@ -116,13 +117,13 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
   return (
     <div className="h-full flex flex-col">
       {/* Compact Controls Bar */}
-      <div className="mb-2 p-2 bg-white rounded shadow-sm border border-gray-200">
+      <div className={`mb-2 p-2 rounded shadow-sm border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <div className="flex items-center justify-between gap-4 flex-wrap text-xs">
           {/* Range Selector */}
           <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-700">Range:</span>
+            <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Range:</span>
             {(['64', '128', '256', '512'] as RadarRange[]).map((range) => (
-              <label key={range} className="flex items-center cursor-pointer">
+              <label key={range} className={`flex items-center cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
                 <input
                   type="radio"
                   name="range"
@@ -138,8 +139,8 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
 
           {/* Overlay Toggles */}
           <div className="flex items-center gap-3 flex-wrap">
-            <span className="font-medium text-gray-700">Layers:</span>
-            <label className="flex items-center cursor-pointer">
+            <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Layers:</span>
+            <label className={`flex items-center cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
               <input
                 type="checkbox"
                 checked={overlays.locations}
@@ -148,7 +149,7 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
               />
               <span>Locations</span>
             </label>
-            <label className="flex items-center cursor-pointer">
+            <label className={`flex items-center cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
               <input
                 type="checkbox"
                 checked={overlays.range}
@@ -157,7 +158,7 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
               />
               <span>Range</span>
             </label>
-            <label className="flex items-center cursor-pointer">
+            <label className={`flex items-center cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
               <input
                 type="checkbox"
                 checked={overlays.topography}
@@ -166,7 +167,7 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
               />
               <span>Topo</span>
             </label>
-            <label className="flex items-center cursor-pointer">
+            <label className={`flex items-center cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
               <input
                 type="checkbox"
                 checked={overlays.catchments}
@@ -175,7 +176,7 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
               />
               <span>Catchments</span>
             </label>
-            <label className="flex items-center cursor-pointer">
+            <label className={`flex items-center cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
               <input
                 type="checkbox"
                 checked={overlays.background}

@@ -13,14 +13,26 @@ function App() {
   const [selectedRadar, setSelectedRadar] = useState(radarLocations[0]);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Load saved location preference on mount
+  // Load saved preferences on mount
   useEffect(() => {
     const savedLocation = loadLocationPreference();
     if (savedLocation) {
       setUserLocation(savedLocation);
     }
+
+    // Load dark mode preference
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode !== null) {
+      setIsDarkMode(savedDarkMode === 'true');
+    }
   }, []);
+
+  // Save dark mode preference when it changes
+  useEffect(() => {
+    localStorage.setItem('darkMode', isDarkMode.toString());
+  }, [isDarkMode]);
 
   // Calculate nearest radars when user location changes
   const nearestRadars: RadarWithDistance[] = useMemo(() => {
@@ -59,19 +71,19 @@ function App() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className={`h-screen flex flex-col ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Compact Single-Row Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className={`shadow-sm border-b ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 flex-wrap">
             {/* Title */}
-            <h1 className="text-lg font-bold text-gray-900 whitespace-nowrap">
+            <h1 className={`text-lg font-bold whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               No-Consultant Weather
             </h1>
 
             {/* Radar Selector */}
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <label htmlFor="radar-select" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+              <label htmlFor="radar-select" className={`text-sm font-medium whitespace-nowrap ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 Radar:
               </label>
               <select
@@ -83,7 +95,7 @@ function App() {
                   );
                   if (radar) setSelectedRadar(radar);
                 }}
-                className="flex-1 min-w-0 px-3 py-1.5 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md bg-white"
+                className={`flex-1 min-w-0 px-3 py-1.5 text-sm border focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
               >
                 {nearestRadars.length > 0 && (
                   <optgroup label="📍 Nearest">
@@ -114,6 +126,15 @@ function App() {
             >
               {isLoadingLocation ? 'Locating...' : '📍 Find Nearest'}
             </button>
+
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className={`px-3 py-1.5 text-sm rounded transition whitespace-nowrap ${isDarkMode ? 'bg-gray-700 text-yellow-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+              aria-label="Toggle dark mode"
+            >
+              {isDarkMode ? '☀️ Light' : '🌙 Dark'}
+            </button>
           </div>
         </div>
       </header>
@@ -124,19 +145,20 @@ function App() {
           <RadarViewer
             key={selectedRadar.baseId}
             baseId={selectedRadar.baseId}
+            isDarkMode={isDarkMode}
           />
         </div>
       </main>
 
       {/* Compact Footer */}
-      <footer className="py-2 text-center border-t border-gray-200 bg-white">
-        <p className="text-xs text-gray-500">
+      <footer className={`py-2 text-center border-t ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
+        <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
           Data from{' '}
           <a
             href="http://www.bom.gov.au/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:text-blue-800"
+            className={`hover:underline ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
           >
             Australian Bureau of Meteorology
           </a>
