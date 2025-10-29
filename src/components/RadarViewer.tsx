@@ -14,9 +14,9 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [overlays, setOverlays] = useState<RadarOverlays>({
-    background: false,
-    topography: false,
-    catchments: false,
+    background: true,
+    topography: true,
+    catchments: true,
     range: true,
     locations: true,
   });
@@ -189,26 +189,31 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
 
       {/* Radar Image with Overlays */}
       <div className="bg-gray-100 rounded-lg overflow-hidden shadow-lg relative">
-        {/* Base radar image */}
-        <img
-          src={currentImage.url}
-          alt={`Radar loop frame ${currentIndex + 1}`}
-          className="w-full h-auto block"
-        />
-
-        {/* Transparency overlays - stacked in order */}
+        {/* Background layer - behind everything */}
         {overlays.background && (
           <img
             src={`${transparencyBaseUrl}.background.png`}
             alt="Background overlay"
             className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ zIndex: 1 }}
           />
         )}
+
+        {/* Radar image - on top of background */}
+        <img
+          src={currentImage.url}
+          alt={`Radar loop frame ${currentIndex + 1}`}
+          className="w-full h-auto block relative"
+          style={{ zIndex: 2 }}
+        />
+
+        {/* Transparency overlays - on top of radar image */}
         {overlays.topography && (
           <img
             src={`${transparencyBaseUrl}.topography.png`}
             alt="Topography overlay"
             className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ zIndex: 3 }}
           />
         )}
         {overlays.catchments && (
@@ -216,6 +221,7 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
             src={`${transparencyBaseUrl}.catchments.png`}
             alt="Catchments overlay"
             className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ zIndex: 4 }}
           />
         )}
         {overlays.range && (
@@ -223,6 +229,7 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
             src={`${transparencyBaseUrl}.range.png`}
             alt="Range rings overlay"
             className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ zIndex: 5 }}
           />
         )}
         {overlays.locations && (
@@ -230,6 +237,7 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
             src={`${transparencyBaseUrl}.locations.png`}
             alt="Locations overlay"
             className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ zIndex: 6 }}
           />
         )}
       </div>
