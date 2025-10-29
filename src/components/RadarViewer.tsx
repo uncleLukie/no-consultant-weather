@@ -189,7 +189,7 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
 
       {/* Radar Image with Overlays */}
       <div className="bg-gray-100 rounded-lg overflow-hidden shadow-lg relative">
-        {/* Background layer - behind everything */}
+        {/* Base layers - UNDER the radar image */}
         {overlays.background && (
           <img
             src={`${transparencyBaseUrl}.background.png`}
@@ -198,22 +198,12 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
             style={{ zIndex: 1 }}
           />
         )}
-
-        {/* Radar image - on top of background */}
-        <img
-          src={currentImage.url}
-          alt={`Radar loop frame ${currentIndex + 1}`}
-          className="w-full h-auto block relative"
-          style={{ zIndex: 2 }}
-        />
-
-        {/* Transparency overlays - on top of radar image */}
         {overlays.topography && (
           <img
             src={`${transparencyBaseUrl}.topography.png`}
             alt="Topography overlay"
             className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ zIndex: 3 }}
+            style={{ zIndex: 2 }}
           />
         )}
         {overlays.catchments && (
@@ -221,9 +211,19 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
             src={`${transparencyBaseUrl}.catchments.png`}
             alt="Catchments overlay"
             className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ zIndex: 4 }}
+            style={{ zIndex: 3 }}
           />
         )}
+
+        {/* Radar image - the rain data */}
+        <img
+          src={currentImage.url}
+          alt={`Radar loop frame ${currentIndex + 1}`}
+          className="w-full h-auto block relative"
+          style={{ zIndex: 4 }}
+        />
+
+        {/* Top layers - ON TOP of the radar image */}
         {overlays.range && (
           <img
             src={`${transparencyBaseUrl}.range.png`}
