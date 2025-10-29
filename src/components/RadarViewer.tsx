@@ -110,80 +110,77 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
   const transparencyBaseUrl = `https://reg.bom.gov.au/products/radar_transparencies/${currentProductId}`;
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      {/* Range Selector */}
-      <div className="mb-4 p-4 bg-white rounded-lg shadow-sm">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Radar Range
-        </label>
-        <div className="flex gap-4 flex-wrap">
-          {(['64', '128', '256', '512'] as RadarRange[]).map((range) => (
-            <label key={range} className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="range"
-                value={range}
-                checked={selectedRange === range}
-                onChange={(e) => setSelectedRange(e.target.value as RadarRange)}
-                className="mr-2"
-              />
-              <span className="text-sm">{range} km</span>
-            </label>
-          ))}
-        </div>
-      </div>
+    <div className="w-full max-w-6xl mx-auto">
+      {/* Compact Controls Bar */}
+      <div className="mb-3 p-2 bg-white rounded shadow-sm border border-gray-200">
+        <div className="flex items-center justify-between gap-4 flex-wrap text-xs">
+          {/* Range Selector */}
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-700">Range:</span>
+            {(['64', '128', '256', '512'] as RadarRange[]).map((range) => (
+              <label key={range} className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="range"
+                  value={range}
+                  checked={selectedRange === range}
+                  onChange={(e) => setSelectedRange(e.target.value as RadarRange)}
+                  className="mr-1"
+                />
+                <span>{range}km</span>
+              </label>
+            ))}
+          </div>
 
-      {/* Overlay Controls */}
-      <div className="mb-4 p-4 bg-white rounded-lg shadow-sm">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Map Overlays
-        </label>
-        <div className="flex gap-4 flex-wrap">
-          <label className="flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={overlays.locations}
-              onChange={(e) => setOverlays({ ...overlays, locations: e.target.checked })}
-              className="mr-2"
-            />
-            <span className="text-sm">Locations</span>
-          </label>
-          <label className="flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={overlays.range}
-              onChange={(e) => setOverlays({ ...overlays, range: e.target.checked })}
-              className="mr-2"
-            />
-            <span className="text-sm">Range Rings</span>
-          </label>
-          <label className="flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={overlays.topography}
-              onChange={(e) => setOverlays({ ...overlays, topography: e.target.checked })}
-              className="mr-2"
-            />
-            <span className="text-sm">Topography</span>
-          </label>
-          <label className="flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={overlays.catchments}
-              onChange={(e) => setOverlays({ ...overlays, catchments: e.target.checked })}
-              className="mr-2"
-            />
-            <span className="text-sm">Catchments</span>
-          </label>
-          <label className="flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={overlays.background}
-              onChange={(e) => setOverlays({ ...overlays, background: e.target.checked })}
-              className="mr-2"
-            />
-            <span className="text-sm">Background</span>
-          </label>
+          {/* Overlay Toggles */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="font-medium text-gray-700">Layers:</span>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={overlays.locations}
+                onChange={(e) => setOverlays({ ...overlays, locations: e.target.checked })}
+                className="mr-1"
+              />
+              <span>Locations</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={overlays.range}
+                onChange={(e) => setOverlays({ ...overlays, range: e.target.checked })}
+                className="mr-1"
+              />
+              <span>Range</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={overlays.topography}
+                onChange={(e) => setOverlays({ ...overlays, topography: e.target.checked })}
+                className="mr-1"
+              />
+              <span>Topo</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={overlays.catchments}
+                onChange={(e) => setOverlays({ ...overlays, catchments: e.target.checked })}
+                className="mr-1"
+              />
+              <span>Catchments</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={overlays.background}
+                onChange={(e) => setOverlays({ ...overlays, background: e.target.checked })}
+                className="mr-1"
+              />
+              <span>Background</span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -242,43 +239,34 @@ export function RadarViewer({ baseId }: RadarViewerProps) {
         )}
       </div>
 
-      {/* Controls */}
-      <div className="mt-4 flex flex-col items-center gap-4">
-        {/* Timestamp */}
-        <div className="text-lg font-medium text-gray-700">
-          {formatTimestamp(currentImage.timestamp)}
-        </div>
+      {/* Compact Playback Controls */}
+      <div className="mt-3 flex items-center justify-center gap-3 text-sm">
+        <button
+          onClick={handlePrevious}
+          className="px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-xs"
+          disabled={images.length <= 1}
+        >
+          ◀ Prev
+        </button>
 
-        {/* Playback Controls */}
-        <div className="flex items-center gap-4">
-          <button
-            onClick={handlePrevious}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-            disabled={images.length <= 1}
-          >
-            Previous
-          </button>
+        <button
+          onClick={() => setIsPlaying(!isPlaying)}
+          className="px-4 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-medium text-xs"
+        >
+          {isPlaying ? '⏸ Pause' : '▶ Play'}
+        </button>
 
-          <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-medium"
-          >
-            {isPlaying ? 'Pause' : 'Play'}
-          </button>
+        <button
+          onClick={handleNext}
+          className="px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-xs"
+          disabled={images.length <= 1}
+        >
+          Next ▶
+        </button>
 
-          <button
-            onClick={handleNext}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-            disabled={images.length <= 1}
-          >
-            Next
-          </button>
-        </div>
-
-        {/* Frame indicator */}
-        <div className="text-sm text-gray-600">
-          Frame {currentIndex + 1} of {images.length}
-        </div>
+        <span className="text-xs text-gray-600 ml-2">
+          {formatTimestamp(currentImage.timestamp)} • Frame {currentIndex + 1}/{images.length}
+        </span>
       </div>
     </div>
   );
