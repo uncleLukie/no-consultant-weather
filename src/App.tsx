@@ -50,8 +50,8 @@ function App() {
 
         {/* Radar Viewer */}
         <RadarViewer
-          key={selectedRadar.productId}
-          productId={selectedRadar.productId}
+          key={selectedRadar.baseId}
+          baseId={selectedRadar.baseId}
         />
       </main>
 

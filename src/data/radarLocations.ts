@@ -3,16 +3,15 @@ import { RadarLocation } from '../types/radar';
 /**
  * Australian Bureau of Meteorology Weather Radar Locations
  *
- * Product IDs are constructed as IDR + radar number + product code
- * Common product codes:
- * - XX3: 128 km loop (most common for general viewing)
- * - XX1: 512 km loop
- * - XX4: Doppler wind
+ * Product IDs are constructed as IDR + baseId + range code
+ * Range codes:
+ * - 1: 512 km range
+ * - 2: 256 km range
+ * - 3: 128 km range (default)
+ * - 4: 64 km range
  *
- * To find the correct product ID for a location:
- * 1. Visit https://reg.bom.gov.au/australia/radar/
- * 2. Click on the radar location
- * 3. Look at the URL of the loop page (e.g., IDR663.loop.shtml)
+ * Example: Brisbane baseId "66" becomes:
+ * - IDR661 (512 km), IDR662 (256 km), IDR663 (128 km), IDR664 (64 km)
  */
 export const radarLocations: RadarLocation[] = [
   // Queensland
@@ -21,6 +20,7 @@ export const radarLocations: RadarLocation[] = [
     name: 'Brisbane',
     location: 'Mt Stapylton',
     state: 'QLD',
+    baseId: '66',
     productId: 'IDR663',
   },
   {
@@ -28,6 +28,7 @@ export const radarLocations: RadarLocation[] = [
     name: 'Cairns',
     location: 'Saddle Mountain',
     state: 'QLD',
+    baseId: '50',
     productId: 'IDR503',
   },
   {
@@ -35,6 +36,7 @@ export const radarLocations: RadarLocation[] = [
     name: 'Gold Coast',
     location: 'Mt Tamborine',
     state: 'QLD',
+    baseId: '76',
     productId: 'IDR763',
   },
 
@@ -44,6 +46,7 @@ export const radarLocations: RadarLocation[] = [
     name: 'Sydney',
     location: 'Terrey Hills',
     state: 'NSW',
+    baseId: '71',
     productId: 'IDR713',
   },
   {
@@ -51,6 +54,7 @@ export const radarLocations: RadarLocation[] = [
     name: 'Newcastle',
     location: 'Lemon Tree Passage',
     state: 'NSW',
+    baseId: '04',
     productId: 'IDR043',
   },
   {
@@ -58,6 +62,7 @@ export const radarLocations: RadarLocation[] = [
     name: 'Wollongong',
     location: 'Appin',
     state: 'NSW',
+    baseId: '03',
     productId: 'IDR033',
   },
   {
@@ -65,6 +70,7 @@ export const radarLocations: RadarLocation[] = [
     name: 'Canberra',
     location: 'Captains Flat',
     state: 'ACT',
+    baseId: '40',
     productId: 'IDR403',
   },
 
@@ -74,6 +80,7 @@ export const radarLocations: RadarLocation[] = [
     name: 'Melbourne',
     location: 'Laverton',
     state: 'VIC',
+    baseId: '02',
     productId: 'IDR023',
   },
 
@@ -83,6 +90,7 @@ export const radarLocations: RadarLocation[] = [
     name: 'Adelaide',
     location: 'Buckland Park',
     state: 'SA',
+    baseId: '64',
     productId: 'IDR643',
   },
 
@@ -92,6 +100,7 @@ export const radarLocations: RadarLocation[] = [
     name: 'Perth',
     location: 'Serpentine',
     state: 'WA',
+    baseId: '70',
     productId: 'IDR703',
   },
 
@@ -101,6 +110,7 @@ export const radarLocations: RadarLocation[] = [
     name: 'Hobart',
     location: 'Mt Koonya',
     state: 'TAS',
+    baseId: '42',
     productId: 'IDR423',
   },
 
@@ -110,6 +120,7 @@ export const radarLocations: RadarLocation[] = [
     name: 'Darwin',
     location: 'Berrimah',
     state: 'NT',
+    baseId: '63',
     productId: 'IDR633',
   },
 ];

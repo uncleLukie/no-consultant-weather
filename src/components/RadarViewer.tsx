@@ -1,17 +1,28 @@
 import { useState, useEffect, useCallback } from 'react';
-import { RadarImage } from '../types/radar';
+import { RadarImage, RadarRange, RadarOverlays } from '../types/radar';
 import { fetchRadarImages, formatTimestamp } from '../utils/radarApi';
 
 interface RadarViewerProps {
-  productId: string;
+  baseId: string;
 }
 
-export function RadarViewer({ productId }: RadarViewerProps) {
+export function RadarViewer({ baseId }: RadarViewerProps) {
+  const [selectedRange, setSelectedRange] = useState<RadarRange>('128');
   const [images, setImages] = useState<RadarImage[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [overlays, setOverlays] = useState<RadarOverlays>({
+    background: false,
+    topography: false,
+    catchments: false,
+    range: true,
+    locations: true,
+  });
+
+  // Generate current product ID based on selected range
+  const currentProductId = `IDR${baseId}${selectedRange === '64' ? '4' : selectedRange === '128' ? '3' : selectedRange === '256' ? '2' : '1'}`;
 
   // Fetch radar images
   useEffect(() => {
@@ -22,7 +33,7 @@ export function RadarViewer({ productId }: RadarViewerProps) {
       setError(null);
 
       try {
-        const radarImages = await fetchRadarImages(productId);
+        const radarImages = await fetchRadarImages(currentProductId);
 
         if (mounted) {
           setImages(radarImages);
@@ -49,7 +60,7 @@ export function RadarViewer({ productId }: RadarViewerProps) {
       mounted = false;
       clearInterval(interval);
     };
-  }, [productId]);
+  }, [currentProductId]);
 
   // Animation loop
   useEffect(() => {
@@ -96,15 +107,131 @@ export function RadarViewer({ productId }: RadarViewerProps) {
 
   const currentImage = images[currentIndex];
 
+  const transparencyBaseUrl = `https://reg.bom.gov.au/products/radar_transparencies/${currentProductId}`;
+
   return (
     <div className="w-full max-w-4xl mx-auto">
-      {/* Radar Image */}
-      <div className="bg-gray-100 rounded-lg overflow-hidden shadow-lg">
+      {/* Range Selector */}
+      <div className="mb-4 p-4 bg-white rounded-lg shadow-sm">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Radar Range
+        </label>
+        <div className="flex gap-4 flex-wrap">
+          {(['64', '128', '256', '512'] as RadarRange[]).map((range) => (
+            <label key={range} className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="range"
+                value={range}
+                checked={selectedRange === range}
+                onChange={(e) => setSelectedRange(e.target.value as RadarRange)}
+                className="mr-2"
+              />
+              <span className="text-sm">{range} km</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Overlay Controls */}
+      <div className="mb-4 p-4 bg-white rounded-lg shadow-sm">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Map Overlays
+        </label>
+        <div className="flex gap-4 flex-wrap">
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={overlays.locations}
+              onChange={(e) => setOverlays({ ...overlays, locations: e.target.checked })}
+              className="mr-2"
+            />
+            <span className="text-sm">Locations</span>
+          </label>
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={overlays.range}
+              onChange={(e) => setOverlays({ ...overlays, range: e.target.checked })}
+              className="mr-2"
+            />
+            <span className="text-sm">Range Rings</span>
+          </label>
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={overlays.topography}
+              onChange={(e) => setOverlays({ ...overlays, topography: e.target.checked })}
+              className="mr-2"
+            />
+            <span className="text-sm">Topography</span>
+          </label>
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={overlays.catchments}
+              onChange={(e) => setOverlays({ ...overlays, catchments: e.target.checked })}
+              className="mr-2"
+            />
+            <span className="text-sm">Catchments</span>
+          </label>
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={overlays.background}
+              onChange={(e) => setOverlays({ ...overlays, background: e.target.checked })}
+              className="mr-2"
+            />
+            <span className="text-sm">Background</span>
+          </label>
+        </div>
+      </div>
+
+      {/* Radar Image with Overlays */}
+      <div className="bg-gray-100 rounded-lg overflow-hidden shadow-lg relative">
+        {/* Base radar image */}
         <img
           src={currentImage.url}
           alt={`Radar loop frame ${currentIndex + 1}`}
-          className="w-full h-auto"
+          className="w-full h-auto block"
         />
+
+        {/* Transparency overlays - stacked in order */}
+        {overlays.background && (
+          <img
+            src={`${transparencyBaseUrl}.background.png`}
+            alt="Background overlay"
+            className="absolute inset-0 w-full h-full pointer-events-none"
+          />
+        )}
+        {overlays.topography && (
+          <img
+            src={`${transparencyBaseUrl}.topography.png`}
+            alt="Topography overlay"
+            className="absolute inset-0 w-full h-full pointer-events-none"
+          />
+        )}
+        {overlays.catchments && (
+          <img
+            src={`${transparencyBaseUrl}.catchments.png`}
+            alt="Catchments overlay"
+            className="absolute inset-0 w-full h-full pointer-events-none"
+          />
+        )}
+        {overlays.range && (
+          <img
+            src={`${transparencyBaseUrl}.range.png`}
+            alt="Range rings overlay"
+            className="absolute inset-0 w-full h-full pointer-events-none"
+          />
+        )}
+        {overlays.locations && (
+          <img
+            src={`${transparencyBaseUrl}.locations.png`}
+            alt="Locations overlay"
+            className="absolute inset-0 w-full h-full pointer-events-none"
+          />
+        )}
       </div>
 
       {/* Controls */}

@@ -1,2 +1,57 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Enforce LF line endings for all text files
+* text=auto eol=lf
+
+# Source code
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.html text eol=lf
+*.xml text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+
+# Documentation
+*.md text eol=lf
+*.txt text eol=lf
+
+# Configuration files
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.editorconfig text eol=lf
+*.config.* text eol=lf
+package.json text eol=lf
+package-lock.json text eol=lf
+tsconfig.json text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+
+# Windows scripts (keep CRLF for these)
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Images (binary)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+
+# Fonts (binary)
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.ttf binary
+*.otf binary
+
+# Other binary files
+*.pdf binary
+*.zip binary
+*.gz binary
+*.tar binary
