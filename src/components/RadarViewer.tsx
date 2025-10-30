@@ -5,9 +5,10 @@ import { fetchRadarImages, formatTimestamp } from '../utils/radarApi';
 interface RadarViewerProps {
   baseId: string;
   isDarkMode: boolean;
+  onError?: (error: string | null) => void;
 }
 
-export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
+export function RadarViewer({ baseId, isDarkMode, onError }: RadarViewerProps) {
   const [selectedRange, setSelectedRange] = useState<RadarRange>(() => {
     // Load saved range from localStorage
     const savedRange = localStorage.getItem('radarRange');
@@ -57,18 +58,21 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
   const loadImages = useCallback(async () => {
     setIsLoading(true);
     setError(null);
+    onError?.(null); // Clear parent error state
 
     try {
       const radarImages = await fetchRadarImages(currentProductId);
       setImages(radarImages);
       setCurrentIndex(radarImages.length - 1); // Start with most recent
     } catch (err) {
-      setError('Failed to load radar data. Please try again later.');
+      const errorMessage = 'Failed to load radar data. Please try again later.';
+      setError(errorMessage);
+      onError?.(errorMessage); // Notify parent of error
       console.error(err);
     } finally {
       setIsLoading(false);
     }
-  }, [currentProductId]);
+  }, [currentProductId, onError]);
 
   // Fetch radar images on mount and when product changes
   useEffect(() => {

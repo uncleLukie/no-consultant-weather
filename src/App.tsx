@@ -21,6 +21,7 @@ function App() {
   });
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [radarError, setRadarError] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Check localStorage first, then fall back to system preference
     const savedDarkMode = localStorage.getItem('darkMode');
@@ -48,6 +49,48 @@ function App() {
   useEffect(() => {
     localStorage.setItem('darkMode', isDarkMode.toString());
   }, [isDarkMode]);
+
+  // IP-based geolocation for initial radar selection
+  useEffect(() => {
+    const initializeLocationFromIP = async () => {
+      // Check if user already has preferences set
+      const savedRadar = localStorage.getItem('selectedRadar');
+      const savedLocation = loadLocationPreference();
+
+      // Don't override if user has already made choices
+      if (savedRadar || savedLocation) return;
+
+      try {
+        // Use IP geolocation to get approximate location
+        const response = await fetch('https://ipapi.co/json/');
+        if (!response.ok) return; // Silently fail
+
+        const data = await response.json();
+
+        if (data.latitude && data.longitude) {
+          const ipLocation = { lat: data.latitude, lng: data.longitude };
+          setUserLocation(ipLocation);
+
+          // Auto-select nearest radar based on IP location
+          const nearest = findNearestRadars(
+            ipLocation.lat,
+            ipLocation.lng,
+            radarLocations,
+            1
+          );
+
+          if (nearest.length > 0) {
+            setSelectedRadar(nearest[0]);
+          }
+        }
+      } catch (error) {
+        // Silently fall back to Sydney default
+        console.log('IP geolocation unavailable, using default radar:', error);
+      }
+    };
+
+    initializeLocationFromIP();
+  }, []); // Run once on mount
 
   // Calculate nearest radars when user location changes
   const nearestRadars: RadarWithDistance[] = useMemo(() => {
@@ -189,12 +232,45 @@ function App() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-hidden">
-        <div className="h-full w-full px-2 py-2 sm:px-4 sm:py-3">
-          <RadarViewer
-            key={selectedRadar.baseId}
-            baseId={selectedRadar.baseId}
-            isDarkMode={isDarkMode}
-          />
+        <div className="h-full w-full px-2 py-2 sm:px-4 sm:py-3 flex flex-col">
+          {/* Error Banner with Nearest Radar Suggestions */}
+          {radarError && (
+            <div className={`mb-2 p-3 rounded-lg border ${isDarkMode ? 'bg-red-900/20 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-800'}`}>
+              <div className="flex flex-col gap-2">
+                <p className="font-medium">{radarError}</p>
+                {nearestRadars.length > 0 && (
+                  <div className="flex flex-col gap-1">
+                    <p className={`text-sm ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>
+                      Try nearby radars:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {nearestRadars.slice(0, 3).map((radar) => (
+                        <button
+                          key={radar.productId}
+                          onClick={() => {
+                            setSelectedRadar(radar);
+                            setRadarError(null);
+                          }}
+                          className={`px-3 py-1.5 text-xs rounded transition ${isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+                        >
+                          {radar.name} ({radar.distance}km away)
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="flex-1 min-h-0">
+            <RadarViewer
+              key={selectedRadar.baseId}
+              baseId={selectedRadar.baseId}
+              isDarkMode={isDarkMode}
+              onError={setRadarError}
+            />
+          </div>
         </div>
       </main>
 
