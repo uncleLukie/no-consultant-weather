@@ -1,0 +1,31 @@
+# Cloudflare Worker Configuration for No-Consultant Weather API
+
+name = "ncw-api"
+main = "workers/api.js"
+compatibility_date = "2025-01-15"
+
+# Workers Free Tier limits:
+# - 100,000 requests per day
+# - 10ms CPU time per request
+# - No charge for usage within limits
+
+[observability]
+enabled = true
+
+# Environment Variables (optional)
+# Add any environment-specific variables here
+# For secrets, use: wrangler secret put SECRET_NAME
+[vars]
+# ENVIRONMENT = "production"
+
+# Routes (optional - if you want to map this to a custom domain)
+# Uncomment and configure after setting up your custom domain in Cloudflare
+# [[routes]]
+# pattern = "ncw.unclelukie.com/api/*"
+# zone_name = "unclelukie.com"
+
+# For development, the worker will be available at:
+# https://ncw-api.unclelukie.workers.dev
+#
+# After deploying, update your frontend .env.production with:
+# VITE_API_URL=https://ncw-api.unclelukie.workers.dev

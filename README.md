@@ -130,17 +130,124 @@ To add a new radar location:
 
 ## Deployment
 
-See `server/README.md` for detailed backend deployment instructions.
+### Cloudflare Pages + Workers (Recommended)
 
-**Quick deployment options:**
+This is the recommended deployment method, offering global edge performance, automatic HTTPS, and generous free tier limits.
+
+#### Prerequisites
+- Cloudflare account (free tier is sufficient)
+- Domain added to Cloudflare (DNS managed by Cloudflare)
+- GitHub repository connected to Cloudflare Pages
+
+#### Step 1: Deploy the Worker (API Backend)
+
+```bash
+# Install dependencies (includes wrangler)
+npm install
+
+# Login to Cloudflare (opens browser)
+npx wrangler login
+
+# Deploy the Worker
+npm run worker:deploy
+```
+
+Your API will be deployed to: `https://ncw-api.<your-subdomain>.workers.dev`
+
+#### Step 2: Deploy Frontend to Cloudflare Pages
+
+1. **Connect GitHub to Cloudflare Pages:**
+   - Go to [Cloudflare Dashboard](https://dash.cloudflare.com) → Pages
+   - Click "Create a project" → "Connect to Git"
+   - Select your GitHub repository
+   - Click "Begin setup"
+
+2. **Configure Build Settings:**
+   - **Project name:** `no-consultant-weather` (or your choice)
+   - **Production branch:** `main`
+   - **Build command:** `npm run build`
+   - **Build output directory:** `dist`
+
+3. **Add Environment Variable:**
+   - Click "Environment variables (advanced)"
+   - Add variable:
+     - **Variable name:** `VITE_API_URL`
+     - **Value:** `https://ncw-api.<your-subdomain>.workers.dev` (from Step 1)
+   - Click "Save and Deploy"
+
+4. **Configure Custom Domain (ncw.unclelukie.com):**
+   - After deployment completes, go to your project
+   - Click "Custom domains" tab
+   - Click "Set up a custom domain"
+   - Enter: `ncw.unclelukie.com`
+   - Cloudflare will automatically configure DNS (domain must already be on Cloudflare)
+   - Wait for DNS propagation (~1-5 minutes)
+
+Your site will be live at `https://ncw.unclelukie.com`!
+
+#### Step 3: (Optional) Map Worker to Custom Domain
+
+To avoid CORS issues and have API on same domain:
+
+1. Edit `wrangler.toml` and uncomment the routes section:
+   ```toml
+   [[routes]]
+   pattern = "ncw.unclelukie.com/api/*"
+   zone_name = "unclelukie.com"
+   ```
+
+2. Redeploy Worker:
+   ```bash
+   npm run worker:deploy
+   ```
+
+3. Update Cloudflare Pages environment variable:
+   - Change `VITE_API_URL` to: `https://ncw.unclelukie.com`
+   - Redeploy Pages (automatic on next git push)
+
+Now your API will be accessible at `https://ncw.unclelukie.com/api/*`
+
+#### Local Development with Cloudflare Worker
+
+```bash
+# Terminal 1 - Run Worker locally
+npm run worker:dev
+# Worker runs on http://localhost:8787
+
+# Terminal 2 - Run frontend (update .env first)
+# Update VITE_API_URL=http://localhost:8787 in .env
+npm run dev
+```
+
+#### Monitoring and Logs
+
+```bash
+# Stream real-time logs from production Worker
+npm run worker:tail
+
+# View metrics in Cloudflare Dashboard
+# Dashboard → Workers & Pages → ncw-api → Metrics
+```
+
+#### Automatic Deployments
+
+Once configured, every push to `main` branch automatically:
+- ✅ Builds and deploys frontend to Cloudflare Pages
+- ⚠️ Worker requires manual deployment: `npm run worker:deploy`
+
+---
+
+### Alternative Deployment Options
+
+See `server/README.md` for alternative backend deployment instructions:
 - Traditional Node.js server with PM2
 - Vercel serverless functions
 - Docker container
 - Any Node.js hosting platform
 
-For production, set the `VITE_API_URL` environment variable to your API URL:
+For production with custom API URL:
 ```bash
-VITE_API_URL=https://unclelukie.com/ncw/api npm run build
+VITE_API_URL=https://your-api-url.com npm run build
 ```
 
 ## Data Attribution

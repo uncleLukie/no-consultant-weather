@@ -1,0 +1,12 @@
+# Local development environment variables for Cloudflare Worker
+# Copy this file to .dev.vars for local development
+#
+# Usage: cp .dev.vars.example .dev.vars
+#
+# Note: .dev.vars is gitignored to prevent secrets from being committed
+
+# Example environment variables (currently none are required)
+# ENVIRONMENT=development
+
+# For production secrets, use:
+# wrangler secret put SECRET_NAME
