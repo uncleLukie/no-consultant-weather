@@ -2,6 +2,8 @@
 
 A minimal, fast, and user-friendly weather radar website for Australia. Built as a direct response to the poorly received redesign of the Australian Bureau of Meteorology (BoM) website.
 
+<img width="492" height="737" alt="image" src="https://github.com/user-attachments/assets/eb1a9f64-ea15-4493-a68f-422f6b13cf42" />
+
 ## Features
 
 - **Simple Interface**: Clean, minimal design that focuses on the radar display
