@@ -10,10 +10,26 @@ import {
 } from './utils/geolocation';
 
 function App() {
-  const [selectedRadar, setSelectedRadar] = useState(radarLocations[0]);
+  const [selectedRadar, setSelectedRadar] = useState(() => {
+    // Load saved radar from localStorage
+    const savedRadarId = localStorage.getItem('selectedRadar');
+    if (savedRadarId) {
+      const radar = radarLocations.find(r => r.productId === savedRadarId);
+      if (radar) return radar;
+    }
+    return radarLocations[0];
+  });
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Check localStorage first, then fall back to system preference
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode !== null) {
+      return savedDarkMode === 'true';
+    }
+    // Default to system preference
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
 
   // Load saved preferences on mount
   useEffect(() => {
@@ -21,13 +37,12 @@ function App() {
     if (savedLocation) {
       setUserLocation(savedLocation);
     }
-
-    // Load dark mode preference
-    const savedDarkMode = localStorage.getItem('darkMode');
-    if (savedDarkMode !== null) {
-      setIsDarkMode(savedDarkMode === 'true');
-    }
   }, []);
+
+  // Save selected radar when it changes
+  useEffect(() => {
+    localStorage.setItem('selectedRadar', selectedRadar.productId);
+  }, [selectedRadar]);
 
   // Save dark mode preference when it changes
   useEffect(() => {

@@ -8,22 +8,50 @@ interface RadarViewerProps {
 }
 
 export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
-  const [selectedRange, setSelectedRange] = useState<RadarRange>('128');
+  const [selectedRange, setSelectedRange] = useState<RadarRange>(() => {
+    // Load saved range from localStorage
+    const savedRange = localStorage.getItem('radarRange');
+    if (savedRange && ['64', '128', '256', '512'].includes(savedRange)) {
+      return savedRange as RadarRange;
+    }
+    return '128';
+  });
   const [images, setImages] = useState<RadarImage[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [overlays, setOverlays] = useState<RadarOverlays>({
-    background: true,
-    topography: true,
-    catchments: true,
-    range: true,
-    locations: true,
+  const [overlays, setOverlays] = useState<RadarOverlays>(() => {
+    // Load saved overlays from localStorage
+    const savedOverlays = localStorage.getItem('radarOverlays');
+    if (savedOverlays) {
+      try {
+        return JSON.parse(savedOverlays);
+      } catch (e) {
+        console.error('Failed to parse saved overlays:', e);
+      }
+    }
+    return {
+      background: true,
+      topography: true,
+      catchments: true,
+      range: true,
+      locations: true,
+    };
   });
 
   // Generate current product ID based on selected range
   const currentProductId = `IDR${baseId}${selectedRange === '64' ? '4' : selectedRange === '128' ? '3' : selectedRange === '256' ? '2' : '1'}`;
+
+  // Save range preference when it changes
+  useEffect(() => {
+    localStorage.setItem('radarRange', selectedRange);
+  }, [selectedRange]);
+
+  // Save overlays preference when they change
+  useEffect(() => {
+    localStorage.setItem('radarOverlays', JSON.stringify(overlays));
+  }, [overlays]);
 
   // Fetch radar images
   useEffect(() => {
@@ -190,7 +218,7 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
       </div>
 
       {/* Radar Image with Overlays */}
-      <div className="flex-1 min-h-0 bg-gray-100 rounded-lg overflow-hidden shadow-lg relative">
+      <div className={`flex-1 min-h-0 rounded-lg overflow-hidden shadow-lg relative ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
         {/* Base layers - UNDER the radar image */}
         {overlays.background && (
           <img
