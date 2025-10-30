@@ -36,15 +36,32 @@ export async function fetchRadarImages(productId: string): Promise<RadarImage[]>
 
 /**
  * Formats timestamp from YYYYMMDDHHmm to readable format
+ * Converts UTC time from BoM to user's local timezone
  */
 export function formatTimestamp(timestamp: string): string {
   if (timestamp.length !== 12) return timestamp;
 
-  const year = timestamp.slice(0, 4);
-  const month = timestamp.slice(4, 6);
-  const day = timestamp.slice(6, 8);
-  const hour = timestamp.slice(8, 10);
-  const minute = timestamp.slice(10, 12);
+  const year = parseInt(timestamp.slice(0, 4));
+  const month = parseInt(timestamp.slice(4, 6));
+  const day = parseInt(timestamp.slice(6, 8));
+  const hour = parseInt(timestamp.slice(8, 10));
+  const minute = parseInt(timestamp.slice(10, 12));
 
-  return `${day}/${month}/${year} ${hour}:${minute}`;
+  // Parse as UTC timestamp (BoM uses UTC)
+  const utcDate = new Date(Date.UTC(year, month - 1, day, hour, minute));
+
+  // Format in user's local timezone
+  const localDateStr = utcDate.toLocaleDateString('en-AU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+
+  const localTimeStr = utcDate.toLocaleTimeString('en-AU', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+
+  return `${localDateStr} ${localTimeStr}`;
 }
