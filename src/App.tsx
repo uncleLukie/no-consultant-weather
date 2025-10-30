@@ -91,9 +91,10 @@ function App() {
       <header className={`shadow-sm border-b ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 flex-wrap">
-            {/* Title */}
-            <h1 className={`text-lg font-bold whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              No-Consultant Weather
+            {/* Title with Icon */}
+            <h1 className={`flex items-center gap-2 text-base md:text-lg font-bold whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              <img src="/thunder.png" alt="Thunder icon" className="w-6 h-6 md:w-7 md:h-7" />
+              <span className="font-sans">No-Consultant Weather</span>
             </h1>
 
             {/* Radar Selector */}
@@ -166,18 +167,49 @@ function App() {
       </main>
 
       {/* Compact Footer */}
-      <footer className={`py-2 text-center border-t ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
-        <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-          Data from{' '}
-          <a
-            href="http://www.bom.gov.au/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`hover:underline ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
-          >
-            Australian Bureau of Meteorology
-          </a>
-        </p>
+      <footer className={`py-3 border-t ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
+        <div className="max-w-7xl mx-auto px-4 flex flex-col gap-2 items-center text-center">
+          <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+            Data from{' '}
+            <a
+              href="http://www.bom.gov.au/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`hover:underline ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
+            >
+              Australian Bureau of Meteorology
+            </a>
+            {' • '}
+            <a
+              href="https://www.flaticon.com/free-icons/rain"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`hover:underline ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
+              title="rain icons"
+            >
+              Icon by Freepik
+            </a>
+          </p>
+          <div className="flex gap-4 items-center">
+            <a
+              href="https://www.linkedin.com/in/unclelukie/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`text-xs hover:underline ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
+            >
+              LinkedIn
+            </a>
+            <span className={`text-xs ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`}>|</span>
+            <a
+              href="https://github.com/uncleLukie/no-consultant-weather"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`text-xs hover:underline ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
+            >
+              GitHub
+            </a>
+          </div>
+        </div>
       </footer>
     </div>
   );

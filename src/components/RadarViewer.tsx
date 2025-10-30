@@ -146,7 +146,81 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
     <div className="h-full flex flex-col">
       {/* Compact Controls Bar */}
       <div className={`mb-2 p-2 rounded shadow-sm border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className="flex items-center justify-between gap-4 flex-wrap text-xs">
+        {/* Mobile Controls (< md breakpoint 768px) */}
+        <div className="md:hidden flex flex-col gap-2 text-xs">
+          {/* Range Dropdown */}
+          <div className="flex items-center gap-2">
+            <label htmlFor="range-select" className={`font-medium whitespace-nowrap ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              Range:
+            </label>
+            <select
+              id="range-select"
+              value={selectedRange}
+              onChange={(e) => setSelectedRange(e.target.value as RadarRange)}
+              className={`flex-1 px-2 py-1 rounded border text-xs ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+            >
+              <option value="64">64 km</option>
+              <option value="128">128 km</option>
+              <option value="256">256 km</option>
+              <option value="512">512 km</option>
+            </select>
+          </div>
+
+          {/* Layers Checkboxes (Compact) */}
+          <div className="flex items-start gap-2">
+            <span className={`font-medium whitespace-nowrap ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Layers:</span>
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1 flex-1">
+              <label className={`flex items-center cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
+                <input
+                  type="checkbox"
+                  checked={overlays.locations}
+                  onChange={(e) => setOverlays({ ...overlays, locations: e.target.checked })}
+                  className="mr-1"
+                />
+                <span className="text-xs">Locations</span>
+              </label>
+              <label className={`flex items-center cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
+                <input
+                  type="checkbox"
+                  checked={overlays.range}
+                  onChange={(e) => setOverlays({ ...overlays, range: e.target.checked })}
+                  className="mr-1"
+                />
+                <span className="text-xs">Range</span>
+              </label>
+              <label className={`flex items-center cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
+                <input
+                  type="checkbox"
+                  checked={overlays.topography}
+                  onChange={(e) => setOverlays({ ...overlays, topography: e.target.checked })}
+                  className="mr-1"
+                />
+                <span className="text-xs">Topo</span>
+              </label>
+              <label className={`flex items-center cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
+                <input
+                  type="checkbox"
+                  checked={overlays.catchments}
+                  onChange={(e) => setOverlays({ ...overlays, catchments: e.target.checked })}
+                  className="mr-1"
+                />
+                <span className="text-xs">Catchments</span>
+              </label>
+              <label className={`flex items-center cursor-pointer col-span-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
+                <input
+                  type="checkbox"
+                  checked={overlays.background}
+                  onChange={(e) => setOverlays({ ...overlays, background: e.target.checked })}
+                  className="mr-1"
+                />
+                <span className="text-xs">Background</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Controls (>= md breakpoint 768px) */}
+        <div className="hidden md:flex items-center justify-between gap-4 flex-wrap text-xs">
           {/* Range Selector */}
           <div className="flex items-center gap-2">
             <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Range:</span>
@@ -218,14 +292,14 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
       </div>
 
       {/* Radar Image with Overlays */}
-      <div className={`flex-1 min-h-0 rounded-lg overflow-hidden shadow-lg relative ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+      <div className={`flex-1 min-h-0 rounded-lg overflow-hidden shadow-lg relative flex items-center justify-center ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
         {/* Base layers - UNDER the radar image */}
         {overlays.background && (
           <img
             src={`${transparencyBaseUrl}.background.png`}
             alt="Background overlay"
             className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{ zIndex: 1 }}
+            style={{ zIndex: 1, objectPosition: 'center' }}
           />
         )}
         {overlays.topography && (
@@ -233,7 +307,7 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
             src={`${transparencyBaseUrl}.topography.png`}
             alt="Topography overlay"
             className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{ zIndex: 2 }}
+            style={{ zIndex: 2, objectPosition: 'center' }}
           />
         )}
         {overlays.catchments && (
@@ -241,7 +315,7 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
             src={`${transparencyBaseUrl}.catchments.png`}
             alt="Catchments overlay"
             className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{ zIndex: 3 }}
+            style={{ zIndex: 3, objectPosition: 'center' }}
           />
         )}
 
@@ -249,8 +323,8 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
         <img
           src={currentImage.url}
           alt={`Radar loop frame ${currentIndex + 1}`}
-          className="w-full h-full object-contain block relative"
-          style={{ zIndex: 4 }}
+          className="w-full h-full object-contain block"
+          style={{ zIndex: 4, objectPosition: 'center', maxWidth: '100%', maxHeight: '100%' }}
         />
 
         {/* Top layers - ON TOP of the radar image */}
@@ -259,7 +333,7 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
             src={`${transparencyBaseUrl}.range.png`}
             alt="Range rings overlay"
             className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{ zIndex: 5 }}
+            style={{ zIndex: 5, objectPosition: 'center' }}
           />
         )}
         {overlays.locations && (
@@ -267,16 +341,16 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
             src={`${transparencyBaseUrl}.locations.png`}
             alt="Locations overlay"
             className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{ zIndex: 6 }}
+            style={{ zIndex: 6, objectPosition: 'center' }}
           />
         )}
       </div>
 
       {/* Compact Playback Controls */}
-      <div className="mt-2 flex items-center justify-center gap-2 text-sm">
+      <div className="mt-2 flex flex-wrap items-center justify-center gap-2 text-sm">
         <button
           onClick={handlePrevious}
-          className="px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-xs"
+          className="px-2 md:px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-xs"
           disabled={images.length <= 1}
         >
           ◀ Prev
@@ -284,14 +358,14 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
 
         <button
           onClick={() => setIsPlaying(!isPlaying)}
-          className="px-4 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-medium text-xs"
+          className="px-3 md:px-4 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-medium text-xs"
         >
           {isPlaying ? '⏸ Pause' : '▶ Play'}
         </button>
 
         <button
           onClick={handleNext}
-          className="px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-xs"
+          className="px-2 md:px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-xs"
           disabled={images.length <= 1}
         >
           Next ▶
@@ -299,13 +373,13 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
 
         <button
           onClick={handleLatest}
-          className="px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 transition text-xs"
+          className="px-2 md:px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 transition text-xs"
           disabled={images.length <= 1 || currentIndex === images.length - 1}
         >
           Latest
         </button>
 
-        <span className="text-xs text-gray-600 ml-2">
+        <span className={`text-xs ml-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
           {formatTimestamp(currentImage.timestamp)} • Frame {currentIndex + 1}/{images.length}
         </span>
       </div>

@@ -31,7 +31,24 @@ export async function getCurrentPosition(): Promise<UserLocation> {
         });
       },
       (error) => {
-        reject(new Error(`Geolocation error: ${error.message}`));
+        // Provide more helpful error messages based on error code
+        let errorMessage = 'Unable to get your location';
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location access denied. Please enable location permissions in your browser settings (Settings → Safari → Location Services).';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information unavailable. Please try again.';
+            break;
+          case error.TIMEOUT:
+            errorMessage = 'Location request timed out. Please try again.';
+            break;
+          default:
+            errorMessage = `Geolocation error: ${error.message}`;
+        }
+
+        reject(new Error(errorMessage));
       },
       {
         enableHighAccuracy: false,
