@@ -116,6 +116,13 @@ function App() {
     return findNearestRadars(userLocation.lat, userLocation.lng, radarLocations, 5);
   }, [userLocation]);
 
+  // Calculate radars nearest to current radar location
+  const nearestToRadar: RadarWithDistance[] = useMemo(() => {
+    if (!selectedRadar) return [];
+    return findNearestRadars(selectedRadar.lat, selectedRadar.lng, radarLocations, 5)
+      .filter(radar => radar.productId !== selectedRadar.productId); // Exclude current radar
+  }, [selectedRadar]);
+
   // Organize radars by state for dropdown
   const radarsByState = useMemo(() => {
     const states = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'NT'];
@@ -272,38 +279,81 @@ function App() {
           {/* Error Banner with Nearest Radar Suggestions */}
           {radarError && selectedRadar && (
             <div className={`mb-2 p-3 rounded-lg border ${isDarkMode ? 'bg-red-900/20 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-800'}`}>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-3">
                 <p className="font-medium">{radarError}</p>
+                
+                {/* Quick fallback buttons */}
                 <div className="flex flex-wrap gap-2">
-                  {/* Try next nearest button */}
+                  {/* Try next nearest to user location */}
                   {userLocation && (
                     <button
                       onClick={handleTryNextNearest}
                       className={`px-3 py-1.5 text-xs rounded transition font-medium ${isDarkMode ? 'bg-orange-600 text-white hover:bg-orange-700' : 'bg-orange-500 text-white hover:bg-orange-600'}`}
                     >
-                      🔄 Try Next Nearest Radar
+                      🔄 Next Nearest to You
                     </button>
                   )}
                   
-                  {/* Manual radar selection buttons */}
-                  {nearestRadars.length > 0 && (
-                    <>
-                      <span className={`text-sm ${isDarkMode ? 'text-red-300' : 'text-red-700'} self-center`}>
-                        Or choose:
+                  {/* Try next nearest to current radar */}
+                  {nearestToRadar.length > 0 && (
+                    <button
+                      onClick={() => {
+                        setSelectedRadar(nearestToRadar[0]);
+                        setRadarError(null);
+                      }}
+                      className={`px-3 py-1.5 text-xs rounded transition font-medium ${isDarkMode ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-purple-500 text-white hover:bg-purple-600'}`}
+                    >
+                      🎯 Next Nearest to {selectedRadar.name}
+                    </button>
+                  )}
+                </div>
+
+                {/* Detailed radar options */}
+                <div className="flex flex-col gap-2">
+                  {/* Radars nearest to user location */}
+                  {userLocation && nearestRadars.length > 0 && (
+                    <div className="flex flex-col gap-1">
+                      <span className={`text-sm font-medium ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>
+                        📍 Nearest to your location:
                       </span>
-                      {nearestRadars.slice(0, 3).map((radar) => (
-                        <button
-                          key={radar.productId}
-                          onClick={() => {
-                            setSelectedRadar(radar);
-                            setRadarError(null);
-                          }}
-                          className={`px-3 py-1.5 text-xs rounded transition ${isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
-                        >
-                          {radar.name} ({radar.distance}km)
-                        </button>
-                      ))}
-                    </>
+                      <div className="flex flex-wrap gap-2">
+                        {nearestRadars.slice(0, 3).map((radar) => (
+                          <button
+                            key={`user-${radar.productId}`}
+                            onClick={() => {
+                              setSelectedRadar(radar);
+                              setRadarError(null);
+                            }}
+                            className={`px-3 py-1.5 text-xs rounded transition ${isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+                          >
+                            {radar.name} ({radar.distance}km)
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Radars nearest to current radar */}
+                  {nearestToRadar.length > 0 && (
+                    <div className="flex flex-col gap-1">
+                      <span className={`text-sm font-medium ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>
+                        🎯 Nearest to {selectedRadar.name}:
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {nearestToRadar.slice(0, 3).map((radar) => (
+                          <button
+                            key={`radar-${radar.productId}`}
+                            onClick={() => {
+                              setSelectedRadar(radar);
+                              setRadarError(null);
+                            }}
+                            className={`px-3 py-1.5 text-xs rounded transition ${isDarkMode ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-purple-500 text-white hover:bg-purple-600'}`}
+                          >
+                            {radar.name} ({radar.distance}km)
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
