@@ -6,10 +6,12 @@ A minimal, fast, and user-friendly weather radar website for Australia. Built as
 
 ## Features
 
-- **Simple Interface**: Clean, minimal design that focuses on the radar display
-- **Australian Coverage**: Major radar locations across all states and territories
+- **Simple Interface**: Clean, minimal design that focuses on radar display
+- **Smart Location Detection**: IP-based geolocation automatically selects nearest radar on first visit
+- **Australian Coverage**: 64 radar locations across all states and territories
 - **Auto-Playing Loops**: Smooth radar animation with playback controls
 - **Auto-Refresh**: Automatically fetches latest radar data every 5 minutes
+- **Intelligent Fallback**: When radar fails, shows both user-nearest and radar-nearest alternatives
 - **No Clutter**: Just the radar loop and simple controls - no unnecessary features
 
 ## Tech Stack
@@ -88,6 +90,8 @@ The Australian Bureau of Meteorology doesn't provide a public JSON API for radar
 2. Displays the radar images in an animated loop
 3. Provides playback controls and location selection
 4. Automatically refreshes data every 5 minutes
+5. IP-based geolocation for automatic radar selection
+6. Intelligent fallback system when radars are unavailable
 
 ### Radar Image URLs
 
