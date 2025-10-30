@@ -53,43 +53,34 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
     localStorage.setItem('radarOverlays', JSON.stringify(overlays));
   }, [overlays]);
 
-  // Fetch radar images
-  useEffect(() => {
-    let mounted = true;
+  // Fetch radar images function
+  const loadImages = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
 
-    async function loadImages() {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const radarImages = await fetchRadarImages(currentProductId);
-
-        if (mounted) {
-          setImages(radarImages);
-          setCurrentIndex(radarImages.length - 1); // Start with most recent
-        }
-      } catch (err) {
-        if (mounted) {
-          setError('Failed to load radar data. Please try again later.');
-          console.error(err);
-        }
-      } finally {
-        if (mounted) {
-          setIsLoading(false);
-        }
-      }
+    try {
+      const radarImages = await fetchRadarImages(currentProductId);
+      setImages(radarImages);
+      setCurrentIndex(radarImages.length - 1); // Start with most recent
+    } catch (err) {
+      setError('Failed to load radar data. Please try again later.');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
+  }, [currentProductId]);
 
+  // Fetch radar images on mount and when product changes
+  useEffect(() => {
     loadImages();
 
     // Refresh every 5 minutes (radar updates every 5-10 minutes)
     const interval = setInterval(loadImages, 5 * 60 * 1000);
 
     return () => {
-      mounted = false;
       clearInterval(interval);
     };
-  }, [currentProductId]);
+  }, [loadImages]);
 
   // Animation loop
   useEffect(() => {
@@ -111,8 +102,11 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
   }, [images.length]);
 
   const handleLatest = useCallback(() => {
-    setCurrentIndex(images.length - 1);
-  }, [images.length]);
+    // Refresh radar data to get latest images
+    loadImages();
+    // Pause playback so user can review latest frame
+    setIsPlaying(false);
+  }, [loadImages]);
 
   if (isLoading) {
     return (
