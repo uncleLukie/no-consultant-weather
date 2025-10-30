@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { RadarViewer } from './components/RadarViewer';
 import { radarLocations } from './data/radarLocations';
 import {
@@ -22,6 +22,7 @@ function App() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [radarError, setRadarError] = useState<string | null>(null);
+  const [failedRadars, setFailedRadars] = useState<Set<string>>(new Set());
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Check localStorage first, then fall back to system preference
     const savedDarkMode = localStorage.getItem('darkMode');
@@ -53,23 +54,26 @@ function App() {
   // IP-based geolocation for initial radar selection
   useEffect(() => {
     const initializeLocationFromIP = async () => {
-      // Check if user already has preferences set
+      // Check if user already has radar preference set
       const savedRadar = localStorage.getItem('selectedRadar');
-      const savedLocation = loadLocationPreference();
-
-      // Don't override if user has already made choices
-      if (savedRadar || savedLocation) return;
+      
+      // Only run IP geolocation if no radar is selected
+      if (savedRadar) return;
 
       try {
         // Use IP geolocation to get approximate location
         const response = await fetch('https://ipapi.co/json/');
-        if (!response.ok) return; // Silently fail
+        if (!response.ok) {
+          console.log('IP geolocation service unavailable');
+          return;
+        }
 
         const data = await response.json();
 
         if (data.latitude && data.longitude) {
           const ipLocation = { lat: data.latitude, lng: data.longitude };
           setUserLocation(ipLocation);
+          saveLocationPreference(ipLocation);
 
           // Auto-select nearest radar based on IP location
           const nearest = findNearestRadars(
@@ -81,10 +85,10 @@ function App() {
 
           if (nearest.length > 0) {
             setSelectedRadar(nearest[0]);
+            console.log(`Auto-selected nearest radar: ${nearest[0].name} (${nearest[0].location})`);
           }
         }
       } catch (error) {
-        // Silently fall back to Sydney default
         console.log('IP geolocation unavailable, using default radar:', error);
       }
     };
@@ -107,6 +111,26 @@ function App() {
     })).filter(group => group.radars.length > 0);
   }, []);
 
+  // Handle radar error with fallback to next nearest
+  const handleRadarError = useCallback((error: string | null) => {
+    setRadarError(error);
+    
+    // If there's an error and we have user location, try fallback
+    if (error && userLocation) {
+      const nearestRadars = findNearestRadars(userLocation.lat, userLocation.lng, radarLocations, 10);
+      
+      // Find the first radar that hasn't failed yet
+      const nextRadar = nearestRadars.find(radar => !failedRadars.has(radar.productId));
+      
+      if (nextRadar && nextRadar.productId !== selectedRadar.productId) {
+        console.log(`Radar ${selectedRadar.productId} failed, trying fallback: ${nextRadar.productId}`);
+        setFailedRadars(prev => new Set(prev).add(selectedRadar.productId));
+        setSelectedRadar(nextRadar);
+        setRadarError(null); // Clear error since we're trying fallback
+      }
+    }
+  }, [userLocation, selectedRadar.productId, failedRadars]);
+
   // Handle browser geolocation
   const handleUseLocation = async () => {
     setIsLoadingLocation(true);
@@ -120,11 +144,26 @@ function App() {
       const nearest = findNearestRadars(position.lat, position.lng, radarLocations, 1);
       if (nearest.length > 0) {
         setSelectedRadar(nearest[0]);
+        setFailedRadars(new Set()); // Reset failed radars when manually selecting location
       }
     } catch (error) {
       console.error('Geolocation error:', error);
     } finally {
       setIsLoadingLocation(false);
+    }
+  };
+
+  // Manual fallback to next nearest radar
+  const handleTryNextNearest = () => {
+    if (!userLocation) return;
+    
+    const nearestRadars = findNearestRadars(userLocation.lat, userLocation.lng, radarLocations, 10);
+    const nextRadar = nearestRadars.find(radar => !failedRadars.has(radar.productId) && radar.productId !== selectedRadar.productId);
+    
+    if (nextRadar) {
+      setFailedRadars(prev => new Set(prev).add(selectedRadar.productId));
+      setSelectedRadar(nextRadar);
+      setRadarError(null);
     }
   };
 
@@ -238,27 +277,39 @@ function App() {
             <div className={`mb-2 p-3 rounded-lg border ${isDarkMode ? 'bg-red-900/20 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-800'}`}>
               <div className="flex flex-col gap-2">
                 <p className="font-medium">{radarError}</p>
-                {nearestRadars.length > 0 && (
-                  <div className="flex flex-col gap-1">
-                    <p className={`text-sm ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>
-                      Try nearby radars:
-                    </p>
-                    <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2">
+                  {/* Auto fallback button */}
+                  {userLocation && (
+                    <button
+                      onClick={handleTryNextNearest}
+                      className={`px-3 py-1.5 text-xs rounded transition font-medium ${isDarkMode ? 'bg-orange-600 text-white hover:bg-orange-700' : 'bg-orange-500 text-white hover:bg-orange-600'}`}
+                    >
+                      🔄 Try Next Nearest Radar
+                    </button>
+                  )}
+                  
+                  {/* Manual radar selection buttons */}
+                  {nearestRadars.length > 0 && (
+                    <>
+                      <span className={`text-sm ${isDarkMode ? 'text-red-300' : 'text-red-700'} self-center`}>
+                        Or choose:
+                      </span>
                       {nearestRadars.slice(0, 3).map((radar) => (
                         <button
                           key={radar.productId}
                           onClick={() => {
                             setSelectedRadar(radar);
                             setRadarError(null);
+                            setFailedRadars(new Set()); // Reset failed radars on manual selection
                           }}
                           className={`px-3 py-1.5 text-xs rounded transition ${isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
                         >
-                          {radar.name} ({radar.distance}km away)
+                          {radar.name} ({radar.distance}km)
                         </button>
                       ))}
-                    </div>
-                  </div>
-                )}
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -268,7 +319,7 @@ function App() {
               key={selectedRadar.baseId}
               baseId={selectedRadar.baseId}
               isDarkMode={isDarkMode}
-              onError={setRadarError}
+              onError={handleRadarError}
             />
           </div>
         </div>
