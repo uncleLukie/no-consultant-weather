@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { RadarViewer } from './components/RadarViewer';
 import { radarLocations } from './data/radarLocations';
+import { RadarLocation } from './types/radar';
 import {
   getCurrentPosition,
   findNearestRadars,
@@ -10,19 +11,18 @@ import {
 } from './utils/geolocation';
 
 function App() {
-  const [selectedRadar, setSelectedRadar] = useState(() => {
+  const [selectedRadar, setSelectedRadar] = useState<RadarLocation | null>(() => {
     // Load saved radar from localStorage
     const savedRadarId = localStorage.getItem('selectedRadar');
     if (savedRadarId) {
       const radar = radarLocations.find(r => r.productId === savedRadarId);
       if (radar) return radar;
     }
-    return radarLocations[0];
+    return null; // Don't default to Sydney, let IP geolocation handle it
   });
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [radarError, setRadarError] = useState<string | null>(null);
-  const [failedRadars, setFailedRadars] = useState<Set<string>>(new Set());
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Check localStorage first, then fall back to system preference
     const savedDarkMode = localStorage.getItem('darkMode');
@@ -43,7 +43,9 @@ function App() {
 
   // Save selected radar when it changes
   useEffect(() => {
-    localStorage.setItem('selectedRadar', selectedRadar.productId);
+    if (selectedRadar) {
+      localStorage.setItem('selectedRadar', selectedRadar.productId);
+    }
   }, [selectedRadar]);
 
   // Save dark mode preference when it changes
@@ -61,14 +63,18 @@ function App() {
       if (savedRadar) return;
 
       try {
+        console.log('Starting IP geolocation...');
         // Use IP geolocation to get approximate location
         const response = await fetch('https://ipapi.co/json/');
         if (!response.ok) {
-          console.log('IP geolocation service unavailable');
+          console.log('IP geolocation service unavailable, falling back to default');
+          // Fallback to first radar if IP geolocation fails
+          setSelectedRadar(radarLocations[0]);
           return;
         }
 
         const data = await response.json();
+        console.log('IP geolocation result:', data);
 
         if (data.latitude && data.longitude) {
           const ipLocation = { lat: data.latitude, lng: data.longitude };
@@ -86,10 +92,18 @@ function App() {
           if (nearest.length > 0) {
             setSelectedRadar(nearest[0]);
             console.log(`Auto-selected nearest radar: ${nearest[0].name} (${nearest[0].location})`);
+          } else {
+            // Fallback to first radar if no nearest found
+            setSelectedRadar(radarLocations[0]);
           }
+        } else {
+          console.log('No coordinates in IP geolocation response, falling back to default');
+          setSelectedRadar(radarLocations[0]);
         }
       } catch (error) {
         console.log('IP geolocation unavailable, using default radar:', error);
+        // Fallback to first radar if IP geolocation fails
+        setSelectedRadar(radarLocations[0]);
       }
     };
 
@@ -111,25 +125,10 @@ function App() {
     })).filter(group => group.radars.length > 0);
   }, []);
 
-  // Handle radar error with fallback to next nearest
+  // Handle radar error - just show error, no automatic fallback
   const handleRadarError = useCallback((error: string | null) => {
     setRadarError(error);
-    
-    // If there's an error and we have user location, try fallback
-    if (error && userLocation) {
-      const nearestRadars = findNearestRadars(userLocation.lat, userLocation.lng, radarLocations, 10);
-      
-      // Find the first radar that hasn't failed yet
-      const nextRadar = nearestRadars.find(radar => !failedRadars.has(radar.productId));
-      
-      if (nextRadar && nextRadar.productId !== selectedRadar.productId) {
-        console.log(`Radar ${selectedRadar.productId} failed, trying fallback: ${nextRadar.productId}`);
-        setFailedRadars(prev => new Set(prev).add(selectedRadar.productId));
-        setSelectedRadar(nextRadar);
-        setRadarError(null); // Clear error since we're trying fallback
-      }
-    }
-  }, [userLocation, selectedRadar.productId, failedRadars]);
+  }, []);
 
   // Handle browser geolocation
   const handleUseLocation = async () => {
@@ -144,7 +143,6 @@ function App() {
       const nearest = findNearestRadars(position.lat, position.lng, radarLocations, 1);
       if (nearest.length > 0) {
         setSelectedRadar(nearest[0]);
-        setFailedRadars(new Set()); // Reset failed radars when manually selecting location
       }
     } catch (error) {
       console.error('Geolocation error:', error);
@@ -155,13 +153,12 @@ function App() {
 
   // Manual fallback to next nearest radar
   const handleTryNextNearest = () => {
-    if (!userLocation) return;
+    if (!userLocation || !selectedRadar) return;
     
     const nearestRadars = findNearestRadars(userLocation.lat, userLocation.lng, radarLocations, 10);
-    const nextRadar = nearestRadars.find(radar => !failedRadars.has(radar.productId) && radar.productId !== selectedRadar.productId);
+    const nextRadar = nearestRadars.find(radar => radar.productId !== selectedRadar.productId);
     
     if (nextRadar) {
-      setFailedRadars(prev => new Set(prev).add(selectedRadar.productId));
       setSelectedRadar(nextRadar);
       setRadarError(null);
     }
@@ -227,7 +224,7 @@ function App() {
               </label>
               <select
                 id="radar-select"
-                value={selectedRadar.productId}
+                value={selectedRadar?.productId || ''}
                 onChange={(e) => {
                   const radar = radarLocations.find(
                     (r) => r.productId === e.target.value
@@ -273,12 +270,12 @@ function App() {
       <main className="flex-1 overflow-hidden">
         <div className="h-full w-full px-2 py-2 sm:px-4 sm:py-3 flex flex-col">
           {/* Error Banner with Nearest Radar Suggestions */}
-          {radarError && (
+          {radarError && selectedRadar && (
             <div className={`mb-2 p-3 rounded-lg border ${isDarkMode ? 'bg-red-900/20 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-800'}`}>
               <div className="flex flex-col gap-2">
                 <p className="font-medium">{radarError}</p>
                 <div className="flex flex-wrap gap-2">
-                  {/* Auto fallback button */}
+                  {/* Try next nearest button */}
                   {userLocation && (
                     <button
                       onClick={handleTryNextNearest}
@@ -300,7 +297,6 @@ function App() {
                           onClick={() => {
                             setSelectedRadar(radar);
                             setRadarError(null);
-                            setFailedRadars(new Set()); // Reset failed radars on manual selection
                           }}
                           className={`px-3 py-1.5 text-xs rounded transition ${isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
                         >
@@ -315,12 +311,20 @@ function App() {
           )}
 
           <div className="flex-1 min-h-0">
-            <RadarViewer
-              key={selectedRadar.baseId}
-              baseId={selectedRadar.baseId}
-              isDarkMode={isDarkMode}
-              onError={handleRadarError}
-            />
+            {selectedRadar ? (
+              <RadarViewer
+                key={selectedRadar.baseId}
+                baseId={selectedRadar.baseId}
+                isDarkMode={isDarkMode}
+                onError={handleRadarError}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <div className={`text-xl ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Detecting your location...
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </main>
