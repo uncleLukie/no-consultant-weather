@@ -147,9 +147,9 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
       {/* Compact Controls Bar */}
       <div className={`mb-2 p-2 rounded shadow-sm border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         {/* Mobile Controls (< md breakpoint 768px) */}
-        <div className="md:hidden flex flex-col gap-2 text-xs">
+        <div className="md:hidden flex items-center gap-2 text-xs">
           {/* Range Dropdown */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <label htmlFor="range-select" className={`font-medium whitespace-nowrap ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Range:
             </label>
@@ -157,7 +157,7 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
               id="range-select"
               value={selectedRange}
               onChange={(e) => setSelectedRange(e.target.value as RadarRange)}
-              className={`flex-1 px-2 py-1 rounded border text-xs ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+              className={`px-2 py-1 rounded border text-xs ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
             >
               <option value="64">64 km</option>
               <option value="128">128 km</option>
@@ -166,34 +166,37 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
             </select>
           </div>
 
-          {/* Layers Checkboxes (Compact) */}
-          <div className="flex items-start gap-2">
+          {/* Divider */}
+          <span className={`${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`}>|</span>
+
+          {/* Layers Compact Checkboxes */}
+          <div className="flex items-center gap-2 flex-1 overflow-x-auto">
             <span className={`font-medium whitespace-nowrap ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Layers:</span>
-            <div className="grid grid-cols-2 gap-x-3 gap-y-1 flex-1">
+            <div className="flex items-center gap-2 whitespace-nowrap">
               <label className={`flex items-center cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
                 <input
                   type="checkbox"
                   checked={overlays.locations}
                   onChange={(e) => setOverlays({ ...overlays, locations: e.target.checked })}
-                  className="mr-1"
+                  className="mr-0.5"
                 />
-                <span className="text-xs">Locations</span>
+                <span className="text-xs">Loc</span>
               </label>
               <label className={`flex items-center cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
                 <input
                   type="checkbox"
                   checked={overlays.range}
                   onChange={(e) => setOverlays({ ...overlays, range: e.target.checked })}
-                  className="mr-1"
+                  className="mr-0.5"
                 />
-                <span className="text-xs">Range</span>
+                <span className="text-xs">Rng</span>
               </label>
               <label className={`flex items-center cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
                 <input
                   type="checkbox"
                   checked={overlays.topography}
                   onChange={(e) => setOverlays({ ...overlays, topography: e.target.checked })}
-                  className="mr-1"
+                  className="mr-0.5"
                 />
                 <span className="text-xs">Topo</span>
               </label>
@@ -202,18 +205,18 @@ export function RadarViewer({ baseId, isDarkMode }: RadarViewerProps) {
                   type="checkbox"
                   checked={overlays.catchments}
                   onChange={(e) => setOverlays({ ...overlays, catchments: e.target.checked })}
-                  className="mr-1"
+                  className="mr-0.5"
                 />
-                <span className="text-xs">Catchments</span>
+                <span className="text-xs">Catch</span>
               </label>
-              <label className={`flex items-center cursor-pointer col-span-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
+              <label className={`flex items-center cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
                 <input
                   type="checkbox"
                   checked={overlays.background}
                   onChange={(e) => setOverlays({ ...overlays, background: e.target.checked })}
-                  className="mr-1"
+                  className="mr-0.5"
                 />
-                <span className="text-xs">Background</span>
+                <span className="text-xs">Bg</span>
               </label>
             </div>
           </div>
