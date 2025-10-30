@@ -125,19 +125,10 @@ function App() {
               </a>
             </div>
 
-            {/* Spacer for mobile wrapping */}
+            {/* Spacer to push theme button to right */}
             <div className="flex-1 md:flex-none min-w-0" />
 
-            {/* Find Nearest Button */}
-            <button
-              onClick={handleUseLocation}
-              disabled={isLoadingLocation}
-              className="px-2 md:px-3 py-1.5 text-xs md:text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
-            >
-              {isLoadingLocation ? 'Locating...' : <><span className="md:hidden">Nearest</span><span className="hidden md:inline">📍 Find Nearest</span></>}
-            </button>
-
-            {/* Dark Mode Toggle - Icon Only */}
+            {/* Dark Mode Toggle - Top Right */}
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
               className={`p-2 text-lg rounded transition ${isDarkMode ? 'bg-gray-700 text-yellow-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
@@ -147,8 +138,8 @@ function App() {
               {isDarkMode ? '☀️' : '🌙'}
             </button>
 
-            {/* Radar Selector - Prominent on mobile, moved to end */}
-            <div className="flex items-center gap-2 w-full md:w-auto md:flex-1 md:max-w-xs">
+            {/* Radar Selector + Nearest Button Row */}
+            <div className="flex items-center gap-2 w-full md:w-auto md:flex-1 md:max-w-md">
               <label htmlFor="radar-select" className={`text-xs md:text-sm font-medium whitespace-nowrap ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 Radar:
               </label>
@@ -182,6 +173,15 @@ function App() {
                   </optgroup>
                 ))}
               </select>
+
+              {/* Find Nearest Button - Next to Radar */}
+              <button
+                onClick={handleUseLocation}
+                disabled={isLoadingLocation}
+                className="px-2 md:px-3 py-1.5 text-xs md:text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                {isLoadingLocation ? '...' : '📍'}
+              </button>
             </div>
           </div>
         </div>
