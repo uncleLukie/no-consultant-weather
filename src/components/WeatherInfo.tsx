@@ -91,7 +91,6 @@ export default function WeatherInfo({ weatherData, loading, error, isDarkMode = 
 
   // Get temperature from observations first, fallback to forecast
   const currentTemp = observations?.temp ?? todayForecast?.temp_max ?? todayForecast?.temp_min;
-  const feelsLike = observations?.temp_feels_like;
   const weatherIcon = getWeatherIcon(todayForecast?.icon_descriptor);
 
   // Collapsed view - single compact line

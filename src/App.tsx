@@ -118,16 +118,16 @@ function App() {
     initializeLocationFromIP();
   }, []); // Run once on mount
 
-  // Fetch weather data when user location changes
+  // Fetch weather data when selected radar changes
   useEffect(() => {
-    if (!userLocation) return;
+    if (!selectedRadar) return;
 
     const loadWeatherData = async () => {
       setIsLoadingWeather(true);
       setWeatherError(null);
 
       try {
-        const data = await fetchWeatherData(userLocation.lat, userLocation.lng);
+        const data = await fetchWeatherData(selectedRadar.lat, selectedRadar.lng);
         setWeatherData(data);
       } catch (error) {
         console.error('Failed to fetch weather data:', error);
@@ -138,7 +138,7 @@ function App() {
     };
 
     loadWeatherData();
-  }, [userLocation]);
+  }, [selectedRadar]);
 
   // Calculate nearest radars when user location changes
   const nearestRadars: RadarWithDistance[] = useMemo(() => {
@@ -240,7 +240,8 @@ function App() {
               {/* Title - Center */}
               <h1 className={`flex items-center gap-2 text-base md:text-lg font-bold whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 <img src="/thunder.png" alt="Thunder icon" className="w-6 h-6 md:w-7 md:h-7" />
-                <span className="font-sans">No-Consultant Weather</span>
+                <span className="font-sans min-[450px]:hidden">NCW</span>
+                <span className="font-sans hidden min-[450px]:inline">No-Consultant Weather</span>
               </h1>
 
               {/* Dark Mode Toggle - Right */}
@@ -307,28 +308,24 @@ function App() {
       <main className="flex-1 overflow-hidden flex flex-col">
         {/* Weather Banner - Mobile/Tablet Only */}
         <div className="lg:hidden">
-          {userLocation && (
-            <WeatherInfo
-              weatherData={weatherData}
-              loading={isLoadingWeather}
-              error={weatherError}
-              isDarkMode={isDarkMode}
-            />
-          )}
+          <WeatherInfo
+            weatherData={weatherData}
+            loading={isLoadingWeather}
+            error={weatherError}
+            isDarkMode={isDarkMode}
+          />
         </div>
 
         {/* 2-Column Layout for Desktop, Single Column for Mobile/Tablet */}
         <div className="flex-1 min-h-0 flex flex-row gap-2 px-1 py-1 sm:px-2 sm:py-2">
           {/* Left Sidebar - Weather + Legend (Desktop Only) */}
           <aside className="hidden lg:flex flex-col gap-2 w-64 xl:w-80 overflow-y-auto">
-            {userLocation && (
-              <WeatherInfo
-                weatherData={weatherData}
-                loading={isLoadingWeather}
-                error={weatherError}
-                isDarkMode={isDarkMode}
-              />
-            )}
+            <WeatherInfo
+              weatherData={weatherData}
+              loading={isLoadingWeather}
+              error={weatherError}
+              isDarkMode={isDarkMode}
+            />
             <RainLegend isDarkMode={isDarkMode} inline={false} />
           </aside>
 
