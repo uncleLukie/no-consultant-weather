@@ -217,11 +217,11 @@ function App() {
             {/* Dark Mode Toggle - Top Right */}
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
-              className={`p-2 text-lg rounded transition ${isDarkMode ? 'bg-gray-700 text-yellow-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+              className={`px-3 py-1.5 text-sm font-medium rounded transition ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}`}
               aria-label="Toggle dark mode"
               title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              {isDarkMode ? '☀️' : '🌙'}
+              {isDarkMode ? 'Light' : 'Dark'}
             </button>
 
             {/* Radar Selector + Nearest Button Row */}
