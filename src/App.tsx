@@ -125,7 +125,7 @@ function App() {
 
   // Organize radars by state for dropdown
   const radarsByState = useMemo(() => {
-    const states = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'NT'];
+    const states = ['NSW', 'ACT', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'NT'];
     return states.map(state => ({
       state,
       radars: radarLocations.filter(r => r.state === state),
