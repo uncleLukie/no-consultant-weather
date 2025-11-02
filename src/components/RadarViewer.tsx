@@ -38,7 +38,14 @@ export function RadarViewer({ baseId, isDarkMode, onError }: RadarViewerProps) {
       catchments: true,
       range: true,
       locations: true,
+      legend: true,
     };
+  });
+
+  const [isLegendExpanded, setIsLegendExpanded] = useState(() => {
+    // Load saved legend state from localStorage
+    const savedState = localStorage.getItem('legendExpanded');
+    return savedState !== null ? savedState === 'true' : true;
   });
 
   // Generate current product ID based on selected range
@@ -53,6 +60,11 @@ export function RadarViewer({ baseId, isDarkMode, onError }: RadarViewerProps) {
   useEffect(() => {
     localStorage.setItem('radarOverlays', JSON.stringify(overlays));
   }, [overlays]);
+
+  // Save legend expanded state when it changes
+  useEffect(() => {
+    localStorage.setItem('legendExpanded', isLegendExpanded.toString());
+  }, [isLegendExpanded]);
 
   // Fetch radar images function
   const loadImages = useCallback(async () => {
@@ -141,9 +153,9 @@ export function RadarViewer({ baseId, isDarkMode, onError }: RadarViewerProps) {
   const transparencyBaseUrl = `https://reg.bom.gov.au/products/radar_transparencies/${currentProductId}`;
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col overflow-hidden">
       {/* Compact Controls Bar */}
-      <div className={`mb-2 p-2 rounded shadow-sm border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+      <div className={`mb-1 p-1.5 rounded shadow-sm border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         {/* Mobile Controls (< md breakpoint 768px) */}
         <div className="md:hidden flex items-center gap-2 text-xs">
           {/* Range Dropdown */}
@@ -347,11 +359,73 @@ export function RadarViewer({ baseId, isDarkMode, onError }: RadarViewerProps) {
         )}
       </div>
 
+      {/* Horizontal Rain Rate Legend */}
+      {overlays.legend && (
+        <div className={`mt-1 rounded shadow-sm border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <div
+            className={`px-2 py-1 font-semibold text-xs flex items-center justify-between cursor-pointer ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}
+            onClick={() => setIsLegendExpanded(!isLegendExpanded)}
+            style={{ borderBottom: isLegendExpanded ? `1px solid ${isDarkMode ? 'rgba(55, 65, 81, 0.5)' : 'rgba(229, 231, 235, 0.5)'}` : 'none' }}
+          >
+            <span>Rain Rate Legend</span>
+            <span className="ml-1 text-xs">{isLegendExpanded ? '▼' : '▶'}</span>
+          </div>
+          {isLegendExpanded && (
+            <div className="px-2 py-1.5">
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                {/* Light */}
+                <div className="flex items-center gap-1">
+                  <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Light:</span>
+                  <div className="flex gap-0.5">
+                    <div className="w-4 h-4 border border-gray-400" style={{ backgroundColor: '#f5f5ff' }} title="Light"></div>
+                    <div className="w-4 h-4" style={{ backgroundColor: '#b4b4ff' }} title="Light"></div>
+                    <div className="w-4 h-4" style={{ backgroundColor: '#7878ff' }} title="Light"></div>
+                    <div className="w-4 h-4" style={{ backgroundColor: '#1414ff' }} title="Light"></div>
+                    <div className="w-4 h-4" style={{ backgroundColor: '#00d8c3' }} title="Light"></div>
+                  </div>
+                </div>
+
+                {/* Moderate */}
+                <div className="flex items-center gap-1">
+                  <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Moderate:</span>
+                  <div className="flex gap-0.5">
+                    <div className="w-4 h-4" style={{ backgroundColor: '#009690' }} title="Moderate"></div>
+                    <div className="w-4 h-4" style={{ backgroundColor: '#006666' }} title="Moderate"></div>
+                    <div className="w-4 h-4" style={{ backgroundColor: '#ffff00' }} title="Moderate"></div>
+                    <div className="w-4 h-4" style={{ backgroundColor: '#ffc800' }} title="Moderate"></div>
+                    <div className="w-4 h-4" style={{ backgroundColor: '#ff9600' }} title="Moderate"></div>
+                  </div>
+                </div>
+
+                {/* Heavy */}
+                <div className="flex items-center gap-1">
+                  <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Heavy:</span>
+                  <div className="flex gap-0.5">
+                    <div className="w-4 h-4" style={{ backgroundColor: '#ff6400' }} title="Heavy"></div>
+                    <div className="w-4 h-4" style={{ backgroundColor: '#ff0000' }} title="Heavy"></div>
+                    <div className="w-4 h-4" style={{ backgroundColor: '#c80000' }} title="Heavy"></div>
+                    <div className="w-4 h-4" style={{ backgroundColor: '#6b0000' }} title="Heavy"></div>
+                  </div>
+                </div>
+
+                {/* Extreme */}
+                <div className="flex items-center gap-1">
+                  <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Extreme:</span>
+                  <div className="flex gap-0.5">
+                    <div className="w-4 h-4" style={{ backgroundColor: '#280000' }} title="Extreme"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Compact Playback Controls */}
-      <div className="mt-2 flex flex-wrap items-center justify-center gap-2 text-sm">
+      <div className="mt-1 flex items-center justify-center gap-1 text-sm overflow-x-auto">
         <button
           onClick={handlePrevious}
-          className="px-2 md:px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-xs"
+          className="px-1.5 md:px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-xs whitespace-nowrap"
           disabled={images.length <= 1}
         >
           ◀ Prev
@@ -359,14 +433,14 @@ export function RadarViewer({ baseId, isDarkMode, onError }: RadarViewerProps) {
 
         <button
           onClick={() => setIsPlaying(!isPlaying)}
-          className="px-3 md:px-4 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-medium text-xs"
+          className="px-2 md:px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-medium text-xs whitespace-nowrap"
         >
           {isPlaying ? '⏸ Pause' : '▶ Play'}
         </button>
 
         <button
           onClick={handleNext}
-          className="px-2 md:px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-xs"
+          className="px-1.5 md:px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-xs whitespace-nowrap"
           disabled={images.length <= 1}
         >
           Next ▶
@@ -374,13 +448,13 @@ export function RadarViewer({ baseId, isDarkMode, onError }: RadarViewerProps) {
 
         <button
           onClick={handleLatest}
-          className="px-2 md:px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 transition text-xs"
+          className="px-1.5 md:px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition text-xs whitespace-nowrap"
           disabled={images.length <= 1 || currentIndex === images.length - 1}
         >
           Latest
         </button>
 
-        <span className={`text-xs ml-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+        <span className={`text-xs ml-1 whitespace-nowrap ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
           {formatTimestamp(currentImage.timestamp)} • Frame {currentIndex + 1}/{images.length}
         </span>
       </div>

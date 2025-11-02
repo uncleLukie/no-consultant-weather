@@ -22,4 +22,5 @@ export interface RadarOverlays {
   catchments: boolean;
   range: boolean;
   locations: boolean;
+  legend: boolean;
 }
