@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { RadarViewer } from './components/RadarViewer';
+import WeatherInfo from './components/WeatherInfo';
 import { radarLocations } from './data/radarLocations';
-import { RadarLocation } from './types/radar';
+import { RadarLocation, WeatherData } from './types/radar';
 import {
   getCurrentPosition,
   findNearestRadars,
@@ -9,6 +10,7 @@ import {
   saveLocationPreference,
   RadarWithDistance,
 } from './utils/geolocation';
+import { fetchWeatherData } from './utils/weatherApi';
 
 function App() {
   const [selectedRadar, setSelectedRadar] = useState<RadarLocation | null>(() => {
@@ -32,6 +34,11 @@ function App() {
     // Default to system preference
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
+
+  // Weather data state
+  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+  const [isLoadingWeather, setIsLoadingWeather] = useState(false);
+  const [weatherError, setWeatherError] = useState<string | null>(null);
 
   // Load saved preferences on mount
   useEffect(() => {
@@ -109,6 +116,28 @@ function App() {
 
     initializeLocationFromIP();
   }, []); // Run once on mount
+
+  // Fetch weather data when user location changes
+  useEffect(() => {
+    if (!userLocation) return;
+
+    const loadWeatherData = async () => {
+      setIsLoadingWeather(true);
+      setWeatherError(null);
+
+      try {
+        const data = await fetchWeatherData(userLocation.lat, userLocation.lng);
+        setWeatherData(data);
+      } catch (error) {
+        console.error('Failed to fetch weather data:', error);
+        setWeatherError(error instanceof Error ? error.message : 'Failed to load weather data');
+      } finally {
+        setIsLoadingWeather(false);
+      }
+    };
+
+    loadWeatherData();
+  }, [userLocation]);
 
   // Calculate nearest radars when user location changes
   const nearestRadars: RadarWithDistance[] = useMemo(() => {
@@ -274,8 +303,18 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden">
-        <div className="h-full w-full px-1 py-1 sm:px-2 sm:py-2 flex flex-col">
+      <main className="flex-1 overflow-hidden flex flex-col">
+        {/* Weather Info Banner */}
+        {userLocation && (
+          <WeatherInfo
+            weatherData={weatherData}
+            loading={isLoadingWeather}
+            error={weatherError}
+            isDarkMode={isDarkMode}
+          />
+        )}
+
+        <div className="flex-1 min-h-0 w-full px-1 py-1 sm:px-2 sm:py-2 flex flex-col">
           {/* Error Banner with Nearest Radar Suggestions */}
           {radarError && selectedRadar && (
             <div className={`mb-2 p-3 rounded-lg border ${isDarkMode ? 'bg-red-900/20 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-800'}`}>
