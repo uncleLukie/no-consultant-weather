@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/radarviewer.tsx","./src/data/radarlocations.ts","./src/types/radar.ts","./src/utils/geolocation.ts","./src/utils/radarapi.ts"],"version":"5.9.3"}
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/radarviewer.tsx","./src/components/rainlegend.tsx","./src/components/weatherinfo.tsx","./src/data/radarlocations.ts","./src/types/radar.ts","./src/utils/geolocation.ts","./src/utils/radarapi.ts","./src/utils/weatherapi.ts"],"version":"5.9.3"}
