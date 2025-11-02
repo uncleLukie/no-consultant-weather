@@ -175,7 +175,7 @@ function App() {
     <div className={`h-screen flex flex-col ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Compact Single-Row Header */}
       <header className={`shadow-sm border-b ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-2 py-2 sm:px-4 sm:py-3 lg:px-8">
           <div className="flex items-center gap-2 md:gap-4 flex-wrap">
             {/* Title with Icon */}
             <h1 className={`flex items-center gap-2 text-base md:text-lg font-bold whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -275,7 +275,7 @@ function App() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-hidden">
-        <div className="h-full w-full px-2 py-2 sm:px-4 sm:py-3 flex flex-col">
+        <div className="h-full w-full px-1 py-1 sm:px-2 sm:py-2 flex flex-col">
           {/* Error Banner with Nearest Radar Suggestions */}
           {radarError && selectedRadar && (
             <div className={`mb-2 p-3 rounded-lg border ${isDarkMode ? 'bg-red-900/20 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-800'}`}>
@@ -380,8 +380,8 @@ function App() {
       </main>
 
       {/* Compact Footer */}
-      <footer className={`py-2 border-t ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
-        <div className="max-w-7xl mx-auto px-4 text-center">
+      <footer className={`py-1 border-t ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
+        <div className="max-w-7xl mx-auto px-2 text-center">
           <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
             Data from{' '}
             <a
