@@ -20,9 +20,9 @@ enabled = true
 
 # Routes (optional - if you want to map this to a custom domain)
 # Uncomment and configure after setting up your custom domain in Cloudflare
-[[routes]]
+# [[routes]]
 # pattern = "ncw.unclelukie.com/api/*"
-zone_name = "unclelukie.com"
+# zone_name = "unclelukie.com"
 
 # For development, the worker will be available at:
 # https://ncw-api.unclelukie.workers.dev
