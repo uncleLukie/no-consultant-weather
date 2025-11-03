@@ -2,8 +2,13 @@
  * No-Consultant Weather - Cloudflare Worker API
  *
  * This Worker proxies requests to the Australian Bureau of Meteorology (BoM)
- * to fetch radar data and return it as JSON with CORS headers.
+ * to fetch radar and weather data and return it as JSON with CORS headers.
  */
+
+// Simple in-memory cache for weather data
+// In Cloudflare Workers, this will persist for the duration of the worker instance
+const weatherCache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 export default {
   async fetch(request, env, ctx) {
@@ -30,6 +35,11 @@ export default {
       return handleRadarRequest(productId, corsHeaders);
     }
 
+    // Route: GET /api/weather?lat={lat}&lng={lng}
+    if (url.pathname === '/api/weather' && request.method === 'GET') {
+      return handleWeatherRequest(url.searchParams, corsHeaders);
+    }
+
     // Route: GET /health
     if (url.pathname === '/health' && request.method === 'GET') {
       return new Response(JSON.stringify({
@@ -49,6 +59,7 @@ export default {
         message: 'No-Consultant Weather API',
         endpoints: {
           '/api/radar/:productId': 'Get radar images for a product ID (e.g., IDR663)',
+          '/api/weather?lat={lat}&lng={lng}': 'Get weather data for coordinates',
           '/health': 'Health check'
         }
       }), {
@@ -136,6 +147,184 @@ async function handleRadarRequest(productId, corsHeaders) {
       }
     });
   }
+}
+
+/**
+ * Handles requests to fetch weather data for given coordinates
+ */
+async function handleWeatherRequest(searchParams, corsHeaders) {
+  const lat = searchParams.get('lat');
+  const lng = searchParams.get('lng');
+
+  // Validate coordinates
+  if (!lat || !lng) {
+    return new Response(JSON.stringify({
+      error: 'Missing required parameters: lat and lng'
+    }), {
+      status: 400,
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders
+      }
+    });
+  }
+
+  const latitude = parseFloat(lat);
+  const longitude = parseFloat(lng);
+
+  if (isNaN(latitude) || isNaN(longitude)) {
+    return new Response(JSON.stringify({
+      error: 'Invalid coordinates: lat and lng must be numbers'
+    }), {
+      status: 400,
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders
+      }
+    });
+  }
+
+  // Check cache
+  const cacheKey = `${latitude},${longitude}`;
+  const cached = weatherCache.get(cacheKey);
+  if (cached && (Date.now() - cached.timestamp < CACHE_DURATION)) {
+    return new Response(JSON.stringify(cached.data), {
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders
+      }
+    });
+  }
+
+  try {
+    // Step 1: Convert lat/lng to geohash
+    const locationData = await fetchLocationGeohash(latitude, longitude);
+
+    if (!locationData || !locationData.geohash) {
+      return new Response(JSON.stringify({
+        error: 'Could not find location data for these coordinates'
+      }), {
+        status: 404,
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders
+        }
+      });
+    }
+
+    // Step 2: Fetch observations and forecast in parallel
+    const [observations, forecast] = await Promise.all([
+      fetchObservations(locationData.geohash),
+      fetchDailyForecast(locationData.geohash)
+    ]);
+
+    const weatherData = {
+      location: {
+        name: locationData.name,
+        state: locationData.state,
+        geohash: locationData.geohash,
+        lat: latitude,
+        lng: longitude
+      },
+      observations: observations || null,
+      forecast: forecast || null
+    };
+
+    // Cache the result
+    weatherCache.set(cacheKey, {
+      data: weatherData,
+      timestamp: Date.now()
+    });
+
+    return new Response(JSON.stringify(weatherData), {
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders
+      }
+    });
+
+  } catch (error) {
+    return new Response(JSON.stringify({
+      error: 'Failed to fetch weather data',
+      message: error.message
+    }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders
+      }
+    });
+  }
+}
+
+/**
+ * Fetches location geohash from BoM API
+ */
+async function fetchLocationGeohash(lat, lng) {
+  const url = `https://api.weather.bom.gov.au/v1/locations?search=${lat},${lng}`;
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`BoM location API error: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+
+  // API returns an array, take the first (closest) result
+  if (data && data.data && data.data.length > 0) {
+    const location = data.data[0];
+    return {
+      geohash: location.geohash,
+      name: location.name,
+      state: location.state
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Fetches current observations from BoM API
+ */
+async function fetchObservations(geohash) {
+  const url = `https://api.weather.bom.gov.au/v1/locations/${geohash}/observations`;
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    console.warn(`BoM observations API error: ${response.statusText}`);
+    return null;
+  }
+
+  const result = await response.json();
+  return result.data || null;
+}
+
+/**
+ * Fetches daily forecast from BoM API
+ */
+async function fetchDailyForecast(geohash) {
+  const url = `https://api.weather.bom.gov.au/v1/locations/${geohash}/forecasts/daily`;
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    console.warn(`BoM forecast API error: ${response.statusText}`);
+    return null;
+  }
+
+  const result = await response.json();
+
+  // Return today's forecast (first item) plus the full array
+  if (result.data && result.data.length > 0) {
+    return {
+      today: result.data[0],
+      daily: result.data
+    };
+  }
+
+  return null;
 }
 
 /**
