@@ -1,4 +1,4 @@
-import { RadarImage } from '../types/radar';
+import { RadarImage, RadarRange, RadarMode } from '../types/radar';
 
 // Use environment variable or default to localhost for development
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
@@ -64,4 +64,41 @@ export function formatTimestamp(timestamp: string): string {
   });
 
   return `${localDateStr} ${localTimeStr}`;
+}
+
+/**
+ * Builds the correct product ID based on radar mode and range
+ *
+ * Rain mode: IDR{baseId}{rangeSuffix}
+ *   - 64km: suffix 4 (e.g., IDR664)
+ *   - 128km: suffix 3 (e.g., IDR663)
+ *   - 256km: suffix 2 (e.g., IDR662)
+ *   - 512km: suffix 1 (e.g., IDR661)
+ *
+ * Doppler mode: Uses fixed doppler product ID (e.g., IDR66I)
+ */
+export function buildProductId(
+  baseId: string,
+  mode: RadarMode,
+  range: RadarRange,
+  dopplerProductId?: string
+): string {
+  if (mode === 'doppler') {
+    // Doppler wind uses a fixed product ID per radar
+    if (!dopplerProductId) {
+      console.warn(`Doppler product ID not available for radar ${baseId}, falling back to rain mode`);
+      // Fallback to rain mode instead of crashing
+      mode = 'rain';
+    } else {
+      return dopplerProductId;
+    }
+  }
+
+  // Rain radar: build product ID from base + range suffix
+  const rangeSuffix = range === '64' ? '4'
+                    : range === '128' ? '3'
+                    : range === '256' ? '2'
+                    : '1'; // 512km
+
+  return `IDR${baseId}${rangeSuffix}`;
 }

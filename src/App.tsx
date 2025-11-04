@@ -5,7 +5,7 @@ import RainLegend from './components/RainLegend';
 import SettingsModal from './components/SettingsModal';
 import TerminalBadge from './components/TerminalBadge';
 import { radarLocations } from './data/radarLocations';
-import { RadarLocation, WeatherData, RadarRange, RadarOverlays } from './types/radar';
+import { RadarLocation, WeatherData, RadarRange, RadarOverlays, RadarMode } from './types/radar';
 import {
   getCurrentPosition,
   findNearestRadars,
@@ -72,6 +72,12 @@ function App() {
     return defaultOverlays;
   });
 
+  // Radar mode state (rain vs doppler)
+  const [radarMode, setRadarMode] = useState<RadarMode>(() => {
+    const savedMode = localStorage.getItem('radarMode');
+    return (savedMode === 'doppler' ? 'doppler' : 'rain') as RadarMode;
+  });
+
   // Weather data state
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [isLoadingWeather, setIsLoadingWeather] = useState(false);
@@ -105,6 +111,18 @@ function App() {
   useEffect(() => {
     localStorage.setItem('radarOverlays', JSON.stringify(overlays));
   }, [overlays]);
+
+  useEffect(() => {
+    localStorage.setItem('radarMode', radarMode);
+  }, [radarMode]);
+
+  // Auto-switch to rain mode if selected radar doesn't support doppler
+  useEffect(() => {
+    if (selectedRadar && radarMode === 'doppler' && !selectedRadar.hasDoppler) {
+      console.log(`Radar ${selectedRadar.name} doesn't support doppler, switching to rain mode`);
+      setRadarMode('rain');
+    }
+  }, [selectedRadar, radarMode]);
 
   // IP-based geolocation for initial radar selection
   useEffect(() => {
@@ -489,6 +507,11 @@ function App() {
                   baseId={selectedRadar.baseId}
                   isDarkMode={isDarkMode}
                   selectedRange={selectedRange}
+                  onRangeChange={setSelectedRange}
+                  currentMode={radarMode}
+                  onModeChange={setRadarMode}
+                  hasDoppler={selectedRadar.hasDoppler}
+                  dopplerProductId={selectedRadar.dopplerProductId}
                   overlays={overlays}
                   onError={handleRadarError}
                 />
@@ -535,8 +558,6 @@ function App() {
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
-        selectedRange={selectedRange}
-        onRangeChange={setSelectedRange}
         overlays={overlays}
         onOverlaysChange={setOverlays}
         isDarkMode={isDarkMode}

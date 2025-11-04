@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
-import { RadarRange, RadarOverlays } from '../types/radar';
+import { RadarOverlays } from '../types/radar';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedRange: RadarRange;
-  onRangeChange: (range: RadarRange) => void;
   overlays: RadarOverlays;
   onOverlaysChange: (overlays: RadarOverlays) => void;
   isDarkMode: boolean;
@@ -15,30 +13,25 @@ interface SettingsModalProps {
 export default function SettingsModal({
   isOpen,
   onClose,
-  selectedRange,
-  onRangeChange,
   overlays,
   onOverlaysChange,
   isDarkMode,
   onDarkModeChange,
 }: SettingsModalProps) {
   // Pending state - changes don't apply until modal closes
-  const [pendingRange, setPendingRange] = useState(selectedRange);
   const [pendingOverlays, setPendingOverlays] = useState(overlays);
   const [pendingDarkMode, setPendingDarkMode] = useState(isDarkMode);
 
   // Initialize pending state when modal opens
   useEffect(() => {
     if (isOpen) {
-      setPendingRange(selectedRange);
       setPendingOverlays(overlays);
       setPendingDarkMode(isDarkMode);
     }
-  }, [isOpen, selectedRange, overlays, isDarkMode]);
+  }, [isOpen, overlays, isDarkMode]);
 
   // Apply changes when closing
   const handleClose = () => {
-    onRangeChange(pendingRange);
     onOverlaysChange(pendingOverlays);
     onDarkModeChange(pendingDarkMode);
     onClose();
@@ -107,37 +100,6 @@ export default function SettingsModal({
 
         {/* Content */}
         <div className="px-6 py-3 sm:py-5 space-y-4 sm:space-y-6 overflow-y-auto max-h-[calc(100vh-16rem)] sm:max-h-[60vh]">
-          {/* Radar Range Section */}
-          <div>
-            <h3
-              className={`text-sm font-semibold uppercase tracking-wide mb-3 ${
-                pendingDarkMode ? 'text-gray-400' : 'text-gray-600'
-              }`}
-            >
-              Radar Range
-            </h3>
-            <div className="space-y-2">
-              {(['64', '128', '256', '512'] as RadarRange[]).map((range) => (
-                <label
-                  key={range}
-                  className={`flex items-center cursor-pointer p-2 rounded transition ${
-                    pendingDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="range"
-                    value={range}
-                    checked={pendingRange === range}
-                    onChange={() => setPendingRange(range)}
-                    className="w-4 h-4 mr-3"
-                  />
-                  <span className="text-base">{range} km</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
           {/* Map Layers Section */}
           <div>
             <h3

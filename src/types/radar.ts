@@ -1,4 +1,5 @@
 export type RadarRange = '64' | '128' | '256' | '512';
+export type RadarMode = 'rain' | 'doppler';
 
 export interface RadarLocation {
   id: string;
@@ -7,6 +8,8 @@ export interface RadarLocation {
   state: string;
   baseId: string; // Base radar ID like "66" for Brisbane
   productId: string; // Full product ID like "IDR713" (default 128km range)
+  hasDoppler: boolean; // Whether this radar supports doppler wind mode
+  dopplerProductId?: string; // Doppler product ID like "IDR66I" (if hasDoppler is true)
   lat: number; // Latitude for proximity calculations
   lng: number; // Longitude for proximity calculations
 }

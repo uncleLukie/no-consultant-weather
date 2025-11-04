@@ -1,25 +1,42 @@
 import { useState, useEffect, useCallback } from 'react';
-import { RadarImage, RadarRange, RadarOverlays } from '../types/radar';
-import { fetchRadarImages, formatTimestamp } from '../utils/radarApi';
+import { RadarImage, RadarRange, RadarOverlays, RadarMode } from '../types/radar';
+import { fetchRadarImages, formatTimestamp, buildProductId } from '../utils/radarApi';
 import RainLegend from './RainLegend';
+import RadarControlBar from './RadarControlBar';
 
 interface RadarViewerProps {
   baseId: string;
   isDarkMode: boolean;
   selectedRange: RadarRange;
+  onRangeChange: (range: RadarRange) => void;
+  currentMode: RadarMode;
+  onModeChange: (mode: RadarMode) => void;
+  hasDoppler: boolean;
+  dopplerProductId?: string;
   overlays: RadarOverlays;
   onError?: (error: string | null) => void;
 }
 
-export function RadarViewer({ baseId, isDarkMode, selectedRange, overlays, onError }: RadarViewerProps) {
+export function RadarViewer({
+  baseId,
+  isDarkMode,
+  selectedRange,
+  onRangeChange,
+  currentMode,
+  onModeChange,
+  hasDoppler,
+  dopplerProductId,
+  overlays,
+  onError
+}: RadarViewerProps) {
   const [images, setImages] = useState<RadarImage[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Generate current product ID based on selected range
-  const currentProductId = `IDR${baseId}${selectedRange === '64' ? '4' : selectedRange === '128' ? '3' : selectedRange === '256' ? '2' : '1'}`;
+  // Generate current product ID based on mode and range
+  const currentProductId = buildProductId(baseId, currentMode, selectedRange, dopplerProductId);
 
   // Fetch radar images function
   const loadImages = useCallback(async () => {
@@ -105,12 +122,30 @@ export function RadarViewer({ baseId, isDarkMode, selectedRange, overlays, onErr
 
   const currentImage = images[currentIndex];
 
-  const transparencyBaseUrl = `https://reg.bom.gov.au/products/radar_transparencies/${currentProductId}`;
+  // For overlays, always use the rain radar product ID (128km default)
+  // Doppler products don't have overlay images, so we use the rain radar overlays
+  const overlayProductId = currentMode === 'doppler'
+    ? `IDR${baseId}3` // 128km rain radar for overlays
+    : currentProductId;
+
+  const transparencyBaseUrl = `https://reg.bom.gov.au/products/radar_transparencies/${overlayProductId}`;
 
   return (
     <div className="h-full flex flex-col overflow-y-auto">
+      {/* Radar Controls */}
+      <div className="w-full max-w-4xl mx-auto">
+        <RadarControlBar
+          currentRange={selectedRange}
+          onRangeChange={onRangeChange}
+          currentMode={currentMode}
+          onModeChange={onModeChange}
+          hasDoppler={hasDoppler}
+          isDarkMode={isDarkMode}
+        />
+      </div>
+
       {/* Radar Image with Overlays */}
-      <div className={`w-full max-w-4xl mx-auto rounded overflow-hidden shadow relative ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`} style={{ aspectRatio: '1' }}>
+      <div className={`w-full max-w-4xl mx-auto rounded-b overflow-hidden shadow relative ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`} style={{ aspectRatio: '1' }}>
         {/* Base layers - UNDER the radar image */}
         {overlays.background && (
           <img
