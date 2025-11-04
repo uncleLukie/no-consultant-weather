@@ -24,16 +24,8 @@ export function RadarViewer({ baseId, isDarkMode, onError }: RadarViewerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [overlays, setOverlays] = useState<RadarOverlays>(() => {
-    // Load saved overlays from localStorage
-    const savedOverlays = localStorage.getItem('radarOverlays');
-    if (savedOverlays) {
-      try {
-        return JSON.parse(savedOverlays);
-      } catch (e) {
-        console.error('Failed to parse saved overlays:', e);
-      }
-    }
-    return {
+    // Default overlay settings
+    const defaultOverlays: RadarOverlays = {
       background: true,
       topography: true,
       catchments: true,
@@ -41,6 +33,18 @@ export function RadarViewer({ baseId, isDarkMode, onError }: RadarViewerProps) {
       locations: true,
       legend: true,
     };
+
+    // Load saved overlays from localStorage
+    const savedOverlays = localStorage.getItem('radarOverlays');
+    if (savedOverlays) {
+      try {
+        // Merge saved overlays with defaults to handle new properties
+        return { ...defaultOverlays, ...JSON.parse(savedOverlays) };
+      } catch (e) {
+        console.error('Failed to parse saved overlays:', e);
+      }
+    }
+    return defaultOverlays;
   });
 
   // Generate current product ID based on selected range
@@ -350,11 +354,9 @@ export function RadarViewer({ baseId, isDarkMode, onError }: RadarViewerProps) {
       </div>
 
       {/* Rain Rate Legend - Mobile/Tablet Only */}
-      {overlays.legend && (
-        <div className="lg:hidden">
-          <RainLegend isDarkMode={isDarkMode} inline={true} />
-        </div>
-      )}
+      <div className="lg:hidden">
+        <RainLegend isDarkMode={isDarkMode} inline={true} />
+      </div>
 
       {/* Compact Playback Controls */}
       <div className="mt-1 flex items-center justify-center gap-1 text-sm overflow-x-auto">
