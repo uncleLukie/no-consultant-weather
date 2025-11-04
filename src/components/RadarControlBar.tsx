@@ -53,11 +53,6 @@ export default function RadarControlBar({
     ? 'bg-gray-700 text-gray-200 hover:bg-gray-600 hover:shadow-md border border-gray-600 focus:ring-gray-500'
     : 'bg-white text-gray-700 hover:bg-gray-50 hover:shadow-md border border-gray-300 focus:ring-gray-300';
 
-  // Disabled state for range buttons when in doppler mode
-  const disabledRangeClass = isDarkMode
-    ? 'bg-gray-800 text-gray-500 border border-gray-700'
-    : 'bg-gray-100 text-gray-400 border border-gray-200';
-
   return (
     <div className={`w-full px-2 py-3 flex flex-wrap items-center justify-center gap-2 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'} rounded-t-lg border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
       {/* Range Buttons */}
