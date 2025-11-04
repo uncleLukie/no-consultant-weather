@@ -131,9 +131,9 @@ export function RadarViewer({
   const transparencyBaseUrl = `https://reg.bom.gov.au/products/radar_transparencies/${overlayProductId}`;
 
   return (
-    <div className="h-full flex flex-col overflow-y-auto">
+    <div className="h-full flex flex-col overflow-y-auto items-start">
       {/* Radar Controls */}
-      <div className="w-full max-w-4xl mx-auto">
+      <div className="w-full max-w-[calc(100vh-12rem)]">
         <RadarControlBar
           currentRange={selectedRange}
           onRangeChange={onRangeChange}
@@ -145,7 +145,7 @@ export function RadarViewer({
       </div>
 
       {/* Radar Image with Overlays */}
-      <div className={`w-full max-w-4xl mx-auto rounded-b overflow-hidden shadow relative ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`} style={{ aspectRatio: '1' }}>
+      <div className={`w-full max-w-[calc(100vh-12rem)] rounded-b overflow-hidden shadow relative ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`} style={{ aspectRatio: '1' }}>
         {/* Base layers - UNDER the radar image */}
         {overlays.background && (
           <img
@@ -205,7 +205,7 @@ export function RadarViewer({
       </div>
 
       {/* Time and Frame Info */}
-      <div className={`mt-2 text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+      <div className={`mt-2 text-center w-full max-w-[calc(100vh-12rem)] ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
         <div className="text-sm md:text-base font-medium">
           {formatTimestamp(currentImage.timestamp)}
         </div>
@@ -215,7 +215,7 @@ export function RadarViewer({
       </div>
 
       {/* Playback Controls */}
-      <div className="mt-2 flex items-center justify-center gap-2 flex-wrap">
+      <div className="mt-2 flex items-center justify-center gap-2 flex-wrap w-full max-w-[calc(100vh-12rem)]">
         <button
           onClick={handlePrevious}
           className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-sm font-medium whitespace-nowrap"

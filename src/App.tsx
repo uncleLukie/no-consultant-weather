@@ -268,12 +268,12 @@ function App() {
     <div className={`h-screen flex flex-col ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Center-Aligned Header */}
       <header className={`shadow-sm border-b ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className="max-w-full mx-auto px-2 py-2 sm:px-4 sm:py-3">
+        <div className="max-w-screen-xl mx-auto px-2 py-2 sm:px-4 sm:py-3 xl:px-12">
           <div className="flex flex-col items-center gap-2">
             {/* Top Row: Title and Controls */}
             <div className="flex items-center justify-center gap-3 w-full relative">
               {/* Social Icons - Left */}
-              <div className="absolute left-0 flex items-center gap-2">
+              <div className="absolute left-0 xl:left-8 flex items-center gap-2">
                 <a
                   href="https://github.com/uncleLukie/no-consultant-weather"
                   target="_blank"
@@ -321,7 +321,7 @@ function App() {
               {/* Settings Button - Right */}
               <button
                 onClick={() => setIsSettingsOpen(true)}
-                className={`absolute right-0 p-2 rounded-lg transition hover:bg-opacity-10 ${isDarkMode ? 'hover:bg-white text-gray-300' : 'hover:bg-gray-900 text-gray-700'}`}
+                className={`absolute right-0 xl:right-8 p-2 rounded-lg transition hover:bg-opacity-10 ${isDarkMode ? 'hover:bg-white text-gray-300' : 'hover:bg-gray-900 text-gray-700'}`}
                 aria-label="Open settings"
                 title="Settings"
               >
@@ -397,20 +397,21 @@ function App() {
 
       {/* Main Content - Responsive Layout */}
       <main className="flex-1 overflow-hidden flex flex-col">
-        {/* Weather Banner - Mobile/Tablet Only */}
-        <div className="lg:hidden">
-          <WeatherInfo
-            weatherData={weatherData}
-            loading={isLoadingWeather}
-            error={weatherError}
-            isDarkMode={isDarkMode}
-          />
-        </div>
+        <div className="flex-1 overflow-hidden flex flex-col max-w-screen-xl mx-auto w-full px-4 lg:px-8 xl:px-12">
+          {/* Weather Banner - Mobile/Tablet Only */}
+          <div className="lg:hidden">
+            <WeatherInfo
+              weatherData={weatherData}
+              loading={isLoadingWeather}
+              error={weatherError}
+              isDarkMode={isDarkMode}
+            />
+          </div>
 
-        {/* 2-Column Layout for Desktop, Single Column for Mobile/Tablet */}
-        <div className="flex-1 min-h-0 flex flex-row gap-2 px-1 py-1 sm:px-2 sm:py-2">
+          {/* 2-Column Layout for Desktop, Single Column for Mobile/Tablet */}
+          <div className="flex-1 min-h-0 flex flex-row gap-4">
           {/* Left Sidebar - Weather + Legend (Desktop Only) */}
-          <aside className="hidden lg:flex flex-col gap-2 w-64 xl:w-80 overflow-y-auto">
+          <aside className="hidden lg:flex flex-col gap-2 w-64 xl:w-80 overflow-y-auto shrink-0">
             <WeatherInfo
               weatherData={weatherData}
               loading={isLoadingWeather}
@@ -525,11 +526,12 @@ function App() {
             </div>
           </div>
         </div>
+        </div>
       </main>
 
       {/* Compact Footer */}
       <footer className={`py-1 border-t ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
-        <div className="max-w-7xl mx-auto px-2 text-center">
+        <div className="max-w-screen-xl mx-auto px-2 xl:px-12 text-center">
           <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
             Data from{' '}
             <a
