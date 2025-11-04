@@ -332,12 +332,12 @@ function App() {
                 }}
                 className={`flex-1 px-2 md:px-3 py-1.5 text-xs md:text-sm border focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
               >
-                <option value="" disabled>Radar: Select location...</option>
+                <option value="" disabled>Select location...</option>
                 {nearestRadars.length > 0 && (
                   <optgroup label="📍 Nearest">
                     {nearestRadars.map((radar) => (
                       <option key={`nearest-${radar.productId}`} value={radar.productId}>
-                        Radar: {radar.name} ({radar.location}) - {radar.distance} km
+                        {radar.name} ({radar.location}) - {radar.distance} km
                       </option>
                     ))}
                   </optgroup>
@@ -346,7 +346,7 @@ function App() {
                   <optgroup key={state} label={state}>
                     {radars.map((radar) => (
                       <option key={radar.productId} value={radar.productId}>
-                        Radar: {radar.name} ({radar.location})
+                        {radar.name} ({radar.location})
                       </option>
                     ))}
                   </optgroup>
