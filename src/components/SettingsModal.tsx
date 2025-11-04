@@ -120,9 +120,9 @@ export default function SettingsModal({
               {(['64', '128', '256', '512'] as RadarRange[]).map((range) => (
                 <label
                   key={range}
-                  className={`flex items-center cursor-pointer p-2 rounded hover:bg-opacity-10 ${
-                    pendingDarkMode ? 'hover:bg-white' : 'hover:bg-gray-900'
-                  } transition`}
+                  className={`flex items-center cursor-pointer p-2 rounded transition ${
+                    pendingDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                  }`}
                 >
                   <input
                     type="radio"
@@ -149,9 +149,9 @@ export default function SettingsModal({
             </h3>
             <div className="space-y-2">
               <label
-                className={`flex items-center cursor-pointer p-2 rounded hover:bg-opacity-10 ${
-                  pendingDarkMode ? 'hover:bg-white' : 'hover:bg-gray-900'
-                } transition`}
+                className={`flex items-center cursor-pointer p-2 rounded transition ${
+                  pendingDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                }`}
               >
                 <input
                   type="checkbox"
@@ -165,9 +165,9 @@ export default function SettingsModal({
               </label>
 
               <label
-                className={`flex items-center cursor-pointer p-2 rounded hover:bg-opacity-10 ${
-                  pendingDarkMode ? 'hover:bg-white' : 'hover:bg-gray-900'
-                } transition`}
+                className={`flex items-center cursor-pointer p-2 rounded transition ${
+                  pendingDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                }`}
               >
                 <input
                   type="checkbox"
@@ -181,9 +181,9 @@ export default function SettingsModal({
               </label>
 
               <label
-                className={`flex items-center cursor-pointer p-2 rounded hover:bg-opacity-10 ${
-                  pendingDarkMode ? 'hover:bg-white' : 'hover:bg-gray-900'
-                } transition`}
+                className={`flex items-center cursor-pointer p-2 rounded transition ${
+                  pendingDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                }`}
               >
                 <input
                   type="checkbox"
@@ -197,9 +197,9 @@ export default function SettingsModal({
               </label>
 
               <label
-                className={`flex items-center cursor-pointer p-2 rounded hover:bg-opacity-10 ${
-                  pendingDarkMode ? 'hover:bg-white' : 'hover:bg-gray-900'
-                } transition`}
+                className={`flex items-center cursor-pointer p-2 rounded transition ${
+                  pendingDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                }`}
               >
                 <input
                   type="checkbox"
@@ -213,9 +213,9 @@ export default function SettingsModal({
               </label>
 
               <label
-                className={`flex items-center cursor-pointer p-2 rounded hover:bg-opacity-10 ${
-                  pendingDarkMode ? 'hover:bg-white' : 'hover:bg-gray-900'
-                } transition`}
+                className={`flex items-center cursor-pointer p-2 rounded transition ${
+                  pendingDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                }`}
               >
                 <input
                   type="checkbox"
@@ -241,9 +241,9 @@ export default function SettingsModal({
             </h3>
             <div className="space-y-2">
               <label
-                className={`flex items-center cursor-pointer p-2 rounded hover:bg-opacity-10 ${
-                  pendingDarkMode ? 'hover:bg-white' : 'hover:bg-gray-900'
-                } transition`}
+                className={`flex items-center cursor-pointer p-2 rounded transition ${
+                  pendingDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                }`}
               >
                 <input
                   type="checkbox"
