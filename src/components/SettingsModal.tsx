@@ -106,7 +106,7 @@ export default function SettingsModal({
         </div>
 
         {/* Content */}
-        <div className="px-6 py-5 space-y-6">
+        <div className="px-6 py-3 sm:py-5 space-y-4 sm:space-y-6 overflow-y-auto max-h-[calc(100vh-16rem)] sm:max-h-[60vh]">
           {/* Radar Range Section */}
           <div>
             <h3

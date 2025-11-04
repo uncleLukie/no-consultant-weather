@@ -14,6 +14,7 @@ import {
   RadarWithDistance,
 } from './utils/geolocation';
 import { fetchWeatherData } from './utils/weatherApi';
+import { useThemeColor } from './hooks/useThemeColor';
 
 function App() {
   const [selectedRadar, setSelectedRadar] = useState<RadarLocation | null>(() => {
@@ -39,6 +40,9 @@ function App() {
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [terminalTextLength, setTerminalTextLength] = useState(0);
+
+  // Update browser theme color to match dark mode
+  useThemeColor(isDarkMode);
 
   // Radar settings state
   const [selectedRange, setSelectedRange] = useState<RadarRange>(() => {
