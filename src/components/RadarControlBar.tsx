@@ -33,9 +33,9 @@ export default function RadarControlBar({
 
   // Base button classes with smooth transitions and modern styling
   const baseButtonClass = `
-    px-2 py-1.5 md:px-4 md:py-2.5
-    text-xs md:text-base font-medium
-    rounded-lg
+    px-1.5 py-1 md:px-4 md:py-2.5
+    text-[10px] md:text-base font-medium
+    rounded-md md:rounded-lg
     transition-all duration-200 ease-out
     transform
     active:scale-95
@@ -54,9 +54,9 @@ export default function RadarControlBar({
     : 'bg-white text-gray-700 hover:bg-gray-50 hover:shadow-md border border-gray-300 focus:ring-gray-300';
 
   return (
-    <div className={`w-full px-2 py-3 flex flex-wrap items-center justify-center gap-1.5 md:gap-2 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'} rounded-t-lg border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+    <div className={`w-full px-1.5 py-2 md:px-2 md:py-3 flex flex-wrap items-center justify-center gap-1 md:gap-2 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'} rounded-t-lg border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
       {/* Range Buttons */}
-      <div className="flex items-center gap-1 md:gap-2">
+      <div className="flex items-center gap-0.5 md:gap-2">
         {ranges.map((range) => {
           const isActive = currentMode === 'rain' && currentRange === range;
 
@@ -71,9 +71,9 @@ export default function RadarControlBar({
               aria-label={`${range} kilometer rain radar range`}
               aria-pressed={isActive}
             >
-              <span className="flex items-center gap-0.5 md:gap-1">
-                <span className="text-xs md:text-sm">☔</span>
-                <span>{range}km</span>
+              <span className="flex items-center gap-0.5">
+                <span className="text-[10px] md:text-sm">☔</span>
+                <span className="whitespace-nowrap">{range}km</span>
               </span>
             </button>
           );
@@ -112,8 +112,7 @@ export default function RadarControlBar({
                 d="M9 2.75C9 1.784 9.784 1 10.75 1h6.5C18.216 1 19 1.784 19 2.75v.5C19 4.216 18.216 5 17.25 5h-6.5A1.75 1.75 0 019 3.25v-.5zM3 8.75C3 7.784 3.784 7 4.75 7h11.5c.966 0 1.75.784 1.75 1.75v.5c0 .966-.784 1.75-1.75 1.75H4.75A1.75 1.75 0 013 9.25v-.5zM6 14.75c0-.966.784-1.75 1.75-1.75h11.5c.966 0 1.75.784 1.75 1.75v.5c0 .966-.784 1.75-1.75 1.75H7.75A1.75 1.75 0 016 15.25v-.5z"
               />
             </svg>
-            <span className="hidden sm:inline">Doppler</span>
-            <span className="sm:hidden">Wind</span>
+            <span className="hidden sm:inline whitespace-nowrap">Doppler</span>
           </span>
         </button>
       )}
