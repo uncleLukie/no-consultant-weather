@@ -2,8 +2,9 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { RadarViewer } from './components/RadarViewer';
 import WeatherInfo from './components/WeatherInfo';
 import RainLegend from './components/RainLegend';
+import SettingsModal from './components/SettingsModal';
 import { radarLocations } from './data/radarLocations';
-import { RadarLocation, WeatherData } from './types/radar';
+import { RadarLocation, WeatherData, RadarRange, RadarOverlays } from './types/radar';
 import {
   getCurrentPosition,
   findNearestRadars,
@@ -35,6 +36,35 @@ function App() {
     // Default to system preference
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  // Radar settings state
+  const [selectedRange, setSelectedRange] = useState<RadarRange>(() => {
+    const savedRange = localStorage.getItem('radarRange');
+    if (savedRange && ['64', '128', '256', '512'].includes(savedRange)) {
+      return savedRange as RadarRange;
+    }
+    return '128';
+  });
+  const [overlays, setOverlays] = useState<RadarOverlays>(() => {
+    const defaultOverlays: RadarOverlays = {
+      background: true,
+      topography: true,
+      catchments: true,
+      range: true,
+      locations: true,
+      legend: true,
+    };
+    const savedOverlays = localStorage.getItem('radarOverlays');
+    if (savedOverlays) {
+      try {
+        return { ...defaultOverlays, ...JSON.parse(savedOverlays) };
+      } catch (e) {
+        console.error('Failed to parse saved overlays:', e);
+      }
+    }
+    return defaultOverlays;
+  });
 
   // Weather data state
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
@@ -60,6 +90,15 @@ function App() {
   useEffect(() => {
     localStorage.setItem('darkMode', isDarkMode.toString());
   }, [isDarkMode]);
+
+  // Save radar settings when they change
+  useEffect(() => {
+    localStorage.setItem('radarRange', selectedRange);
+  }, [selectedRange]);
+
+  useEffect(() => {
+    localStorage.setItem('radarOverlays', JSON.stringify(overlays));
+  }, [overlays]);
 
   // IP-based geolocation for initial radar selection
   useEffect(() => {
@@ -244,14 +283,26 @@ function App() {
                 <span className="font-sans hidden min-[450px]:inline">No-Consultant Weather</span>
               </h1>
 
-              {/* Dark Mode Toggle - Right */}
+              {/* Settings Button - Right */}
               <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className={`absolute right-0 px-3 py-1.5 text-sm font-medium rounded transition ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}`}
-                aria-label="Toggle dark mode"
-                title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                onClick={() => setIsSettingsOpen(true)}
+                className={`absolute right-0 p-2 rounded-lg transition hover:bg-opacity-10 ${isDarkMode ? 'hover:bg-white text-gray-300' : 'hover:bg-gray-900 text-gray-700'}`}
+                aria-label="Open settings"
+                title="Settings"
               >
-                {isDarkMode ? 'Light' : 'Dark'}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-5 h-5"
+                >
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M12 1v6m0 6v6m9-9h-6M7 12H1m15.36 7.36l-4.24-4.24m0-6.36l4.24-4.24M8.64 16.36l-4.24 4.24m0-16.72l4.24 4.24" />
+                </svg>
               </button>
             </div>
 
@@ -415,6 +466,8 @@ function App() {
                   key={selectedRadar.baseId}
                   baseId={selectedRadar.baseId}
                   isDarkMode={isDarkMode}
+                  selectedRange={selectedRange}
+                  overlays={overlays}
                   onError={handleRadarError}
                 />
               ) : (
@@ -455,6 +508,18 @@ function App() {
           </p>
         </div>
       </footer>
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        selectedRange={selectedRange}
+        onRangeChange={setSelectedRange}
+        overlays={overlays}
+        onOverlaysChange={setOverlays}
+        isDarkMode={isDarkMode}
+        onDarkModeChange={setIsDarkMode}
+      />
     </div>
   );
 }
