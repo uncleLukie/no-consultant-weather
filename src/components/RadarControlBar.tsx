@@ -33,8 +33,8 @@ export default function RadarControlBar({
 
   // Base button classes with smooth transitions and modern styling
   const baseButtonClass = `
-    px-3 py-2 md:px-4 md:py-2.5
-    text-sm md:text-base font-medium
+    px-2 py-1.5 md:px-4 md:py-2.5
+    text-xs md:text-base font-medium
     rounded-lg
     transition-all duration-200 ease-out
     transform
@@ -54,9 +54,9 @@ export default function RadarControlBar({
     : 'bg-white text-gray-700 hover:bg-gray-50 hover:shadow-md border border-gray-300 focus:ring-gray-300';
 
   return (
-    <div className={`w-full px-2 py-3 flex flex-wrap items-center justify-center gap-2 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'} rounded-t-lg border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+    <div className={`w-full px-2 py-3 flex flex-wrap items-center justify-center gap-1.5 md:gap-2 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'} rounded-t-lg border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
       {/* Range Buttons */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 md:gap-2">
         {ranges.map((range) => {
           const isActive = currentMode === 'rain' && currentRange === range;
 
@@ -71,8 +71,8 @@ export default function RadarControlBar({
               aria-label={`${range} kilometer rain radar range`}
               aria-pressed={isActive}
             >
-              <span className="flex items-center gap-1">
-                <span>☔</span>
+              <span className="flex items-center gap-0.5 md:gap-1">
+                <span className="text-xs md:text-sm">☔</span>
                 <span>{range}km</span>
               </span>
             </button>
@@ -97,9 +97,9 @@ export default function RadarControlBar({
           aria-pressed={currentMode === 'doppler'}
           title="Show wind speed and direction"
         >
-          <span className="flex items-center gap-1.5">
+          <span className="flex items-center gap-0.5 md:gap-1.5">
             <svg
-              className="w-4 h-4"
+              className="w-3 h-3 md:w-4 md:h-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
