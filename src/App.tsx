@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { Routes, Route, useParams, useNavigate } from 'react-router-dom';
 import { RadarViewer } from './components/RadarViewer';
 import WeatherInfo from './components/WeatherInfo';
 import RainLegend from './components/RainLegend';
@@ -16,9 +17,17 @@ import {
 import { fetchWeatherData } from './utils/weatherApi';
 import { useThemeColor } from './hooks/useThemeColor';
 
-function App() {
+function RadarApp() {
+  const params = useParams<{ radarId?: string; range?: string; mode?: string }>();
+  const navigate = useNavigate();
+
   const [selectedRadar, setSelectedRadar] = useState<RadarLocation | null>(() => {
-    // Load saved radar from localStorage
+    // First check URL params
+    if (params.radarId) {
+      const radar = radarLocations.find(r => r.productId === params.radarId);
+      if (radar) return radar;
+    }
+    // Then check localStorage
     const savedRadarId = localStorage.getItem('selectedRadar');
     if (savedRadarId) {
       const radar = radarLocations.find(r => r.productId === savedRadarId);
@@ -46,6 +55,11 @@ function App() {
 
   // Radar settings state
   const [selectedRange, setSelectedRange] = useState<RadarRange>(() => {
+    // First check URL params
+    if (params.range && ['64', '128', '256', '512'].includes(params.range)) {
+      return params.range as RadarRange;
+    }
+    // Then check localStorage
     const savedRange = localStorage.getItem('radarRange');
     if (savedRange && ['64', '128', '256', '512'].includes(savedRange)) {
       return savedRange as RadarRange;
@@ -74,6 +88,11 @@ function App() {
 
   // Radar mode state (rain vs doppler)
   const [radarMode, setRadarMode] = useState<RadarMode>(() => {
+    // First check URL params
+    if (params.mode && (params.mode === 'doppler' || params.mode === 'rain')) {
+      return params.mode as RadarMode;
+    }
+    // Then check localStorage
     const savedMode = localStorage.getItem('radarMode');
     return (savedMode === 'doppler' ? 'doppler' : 'rain') as RadarMode;
   });
@@ -91,12 +110,15 @@ function App() {
     }
   }, []);
 
-  // Save selected radar when it changes
+  // Save selected radar when it changes AND update URL
   useEffect(() => {
     if (selectedRadar) {
       localStorage.setItem('selectedRadar', selectedRadar.productId);
+      // Update URL to match current state
+      const newPath = `/radar/${selectedRadar.productId}/${selectedRange}/${radarMode}`;
+      navigate(newPath, { replace: true });
     }
-  }, [selectedRadar]);
+  }, [selectedRadar, selectedRange, radarMode, navigate]);
 
   // Save dark mode preference when it changes
   useEffect(() => {
@@ -127,9 +149,12 @@ function App() {
   // IP-based geolocation for initial radar selection
   useEffect(() => {
     const initializeLocationFromIP = async () => {
+      // Skip if URL has radar ID (user is visiting a specific radar)
+      if (params.radarId) return;
+
       // Check if user already has radar preference set
       const savedRadar = localStorage.getItem('selectedRadar');
-      
+
       // Only run IP geolocation if no radar is selected
       if (savedRadar) return;
 
@@ -179,7 +204,7 @@ function App() {
     };
 
     initializeLocationFromIP();
-  }, []); // Run once on mount
+  }, [params.radarId]); // Run when params change or on mount
 
   // Fetch weather data when selected radar changes
   useEffect(() => {
@@ -566,6 +591,17 @@ function App() {
         onDarkModeChange={setIsDarkMode}
       />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<RadarApp />} />
+      <Route path="/radar/:radarId" element={<RadarApp />} />
+      <Route path="/radar/:radarId/:range" element={<RadarApp />} />
+      <Route path="/radar/:radarId/:range/:mode" element={<RadarApp />} />
+    </Routes>
   );
 }
 
