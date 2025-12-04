@@ -49,7 +49,15 @@ function RadarApp() {
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isInstallPromptOpen, setIsInstallPromptOpen] = useState(false);
   const [terminalTextLength, setTerminalTextLength] = useState(0);
+
+  // Listen for custom event to open install prompt
+  useEffect(() => {
+    const handleOpenPrompt = () => setIsInstallPromptOpen(true);
+    window.addEventListener('openInstallPrompt', handleOpenPrompt);
+    return () => window.removeEventListener('openInstallPrompt', handleOpenPrompt);
+  }, []);
 
   // Update browser theme color to match dark mode
   useThemeColor(isDarkMode);
@@ -592,7 +600,11 @@ function RadarApp() {
         onDarkModeChange={setIsDarkMode}
       />
 
-      <IOSInstallPrompt isDarkMode={isDarkMode} />
+      <IOSInstallPrompt
+        isDarkMode={isDarkMode}
+        isOpen={isInstallPromptOpen}
+        onClose={() => setIsInstallPromptOpen(false)}
+      />
     </div>
   );
 }
