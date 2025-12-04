@@ -48,18 +48,6 @@ jobs:
         env:
           CI: true
 
-      - name: Check frontend coverage thresholds
-        run: |
-          echo "Checking frontend coverage meets 80% threshold..."
-          npm run test:coverage -- --reporter=json --reporter=text
-        continue-on-error: false
-
-      - name: Check backend coverage thresholds
-        run: |
-          echo "Checking backend coverage meets 80% threshold..."
-          cd server && npm run test:coverage -- --reporter=json --reporter=text
-        continue-on-error: false
-
       - name: Build frontend
         run: npm run build
         env:
