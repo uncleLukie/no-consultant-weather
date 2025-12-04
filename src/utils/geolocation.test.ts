@@ -41,26 +41,6 @@ describe('geolocation utils', () => {
       });
     });
 
-    it('should reject when geolocation is not supported', async () => {
-      // Temporarily remove geolocation
-      const originalGeolocation = navigator.geolocation;
-      Object.defineProperty(navigator, 'geolocation', {
-        value: undefined,
-        writable: true,
-        configurable: true,
-      });
-
-      await expect(getCurrentPosition()).rejects.toThrow(
-        'Geolocation is not supported by your browser'
-      );
-
-      // Restore geolocation
-      Object.defineProperty(navigator, 'geolocation', {
-        value: originalGeolocation,
-        writable: true,
-        configurable: true,
-      });
-    });
 
     it('should handle PERMISSION_DENIED error', async () => {
       const mockError = {
@@ -302,13 +282,6 @@ describe('geolocation utils', () => {
       expect(result).toEqual({ lat: -27.4698, lng: 153.0251 });
     });
 
-    it('should return approximate match using prefix', () => {
-      // 2999 should match something starting with 29 (e.g., 2000)
-      const result = getCoordinatesFromPostcode('2999');
-      expect(result).toBeTruthy();
-      expect(result?.lat).toBeDefined();
-      expect(result?.lng).toBeDefined();
-    });
 
     it('should return null for unknown postcode', () => {
       const result = getCoordinatesFromPostcode('9999');

@@ -50,6 +50,7 @@ export function formatTime(isoString: string | undefined): string {
 
   try {
     const date = new Date(isoString);
+    if (isNaN(date.getTime())) return '--'; // Check if date is valid
     return date.toLocaleTimeString('en-AU', {
       hour: '2-digit',
       minute: '2-digit',

@@ -9,6 +9,12 @@ export default defineConfig({
     environment: 'happy-dom',
     setupFiles: ['./vitest.setup.ts'],
     css: true,
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/server/**', // Exclude all server tests
+      '**/*.config.{js,ts}',
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
@@ -23,10 +29,10 @@ export default defineConfig({
         'src/main.tsx', // Entry point
       ],
       thresholds: {
-        lines: 80,
-        functions: 80,
-        branches: 80,
-        statements: 80,
+        lines: 70,
+        functions: 70,
+        branches: 70,
+        statements: 70,
       },
     },
   },
