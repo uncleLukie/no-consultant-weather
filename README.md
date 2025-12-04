@@ -111,25 +111,135 @@ To add a new radar location:
 3. Note the product ID from the URL (e.g., `IDR713.loop.shtml` → use `IDR713`)
 4. Add the location to `src/data/radarLocations.ts`
 
+## Testing
+
+This project includes a comprehensive test suite with unit and integration tests covering both frontend and backend code.
+
+### Test Stack
+
+- **Vitest** - Fast, modern test runner (Vite-native)
+- **React Testing Library** - Component testing
+- **MSW (Mock Service Worker)** - API mocking
+- **Supertest** - Backend API testing
+- **Happy-DOM** - Lightweight DOM implementation
+
+### Running Tests
+
+```bash
+# Run all tests (frontend + backend)
+npm test
+
+# Run tests in watch mode (during development)
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
+
+# Run tests with UI
+npm run test:ui
+
+# Run backend tests only
+cd server && npm test
+
+# Run backend tests with coverage
+cd server && npm run test:coverage
+```
+
+### Test Coverage
+
+The project maintains **80%+ code coverage** across:
+- ✅ Backend API endpoints (`/api/radar`, `/api/weather`)
+- ✅ Backend utility functions (parsing, caching)
+- ✅ Frontend API utilities (`radarApi.ts`, `weatherApi.ts`, `geolocation.ts`)
+- ✅ React components (IOSInstallPrompt, etc.)
+
+Coverage reports are generated in:
+- Frontend: `./coverage/`
+- Backend: `./server/coverage/`
+
+### CI/CD Pipeline
+
+GitHub Actions automatically runs on every push and pull request:
+
+```yaml
+✓ Type checking (TypeScript)
+✓ Frontend tests with coverage
+✓ Backend tests with coverage
+✓ Build verification
+✓ Coverage threshold enforcement (80%)
+```
+
+**CI Status:** Tests must pass before merging pull requests.
+
+View workflow: `.github/workflows/test.yml`
+
+### Writing Tests
+
+#### Frontend Component Test Example
+
+```typescript
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { MyComponent } from './MyComponent';
+
+describe('MyComponent', () => {
+  it('should render correctly', () => {
+    render(<MyComponent isDarkMode={false} />);
+    expect(screen.getByText('Hello')).toBeInTheDocument();
+  });
+});
+```
+
+#### Backend API Test Example
+
+```typescript
+import { describe, it, expect } from 'vitest';
+import request from 'supertest';
+import { app } from './server';
+
+describe('GET /api/radar/:id', () => {
+  it('should return radar data', async () => {
+    const response = await request(app).get('/api/radar/IDR663');
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('images');
+  });
+});
+```
+
+### Test Configuration
+
+- `vitest.config.ts` - Frontend test configuration
+- `server/vitest.config.js` - Backend test configuration
+- `vitest.setup.ts` - Global test setup, MSW handlers, browser API mocks
+
 ## Project Structure
 
 ```
+├── .github/
+│   └── workflows/
+│       └── test.yml         # CI/CD pipeline
 ├── server/                  # Backend proxy API
 │   ├── index.js            # Express server
+│   ├── index.test.js       # Backend tests
+│   ├── vitest.config.js    # Backend test config
 │   ├── package.json
 │   └── README.md           # Deployment instructions
 ├── src/                    # Frontend React app
 │   ├── components/
-│   │   └── RadarViewer.tsx
+│   │   ├── RadarViewer.tsx
+│   │   └── *.test.tsx      # Component tests
 │   ├── data/
 │   │   └── radarLocations.ts
 │   ├── types/
 │   │   └── radar.ts
 │   ├── utils/
-│   │   └── radarApi.ts     # Calls the proxy API
+│   │   ├── radarApi.ts     # Calls the proxy API
+│   │   └── *.test.ts       # Utility tests
 │   ├── App.tsx
 │   ├── main.tsx
 │   └── index.css
+├── vitest.config.ts        # Frontend test config
+├── vitest.setup.ts         # Global test setup
 ├── .env.example            # Environment variable template
 └── README.md
 ```

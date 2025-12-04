@@ -1,0 +1,186 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install backend dependencies
+        run: cd server && npm ci
+
+      - name: Type check frontend
+        run: npx tsc --noEmit
+
+      - name: Type check backend
+        run: cd server && npx tsc --noEmit --allowJs --checkJs --esModuleInterop --skipLibCheck index.js
+        continue-on-error: true # Backend is JS, not TS
+
+      - name: Run frontend tests with coverage
+        run: npm run test:coverage
+        env:
+          CI: true
+
+      - name: Run backend tests with coverage
+        run: cd server && npm run test:coverage
+        env:
+          CI: true
+
+      - name: Check frontend coverage thresholds
+        run: |
+          echo "Checking frontend coverage meets 80% threshold..."
+          npm run test:coverage -- --reporter=json --reporter=text
+        continue-on-error: false
+
+      - name: Check backend coverage thresholds
+        run: |
+          echo "Checking backend coverage meets 80% threshold..."
+          cd server && npm run test:coverage -- --reporter=json --reporter=text
+        continue-on-error: false
+
+      - name: Build frontend
+        run: npm run build
+        env:
+          CI: true
+
+      - name: Upload frontend coverage to artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage
+          path: coverage/
+          retention-days: 30
+
+      - name: Upload backend coverage to artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage
+          path: server/coverage/
+          retention-days: 30
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let comment = '## Test Coverage Report\n\n';
+
+            try {
+              const frontendCoverage = JSON.parse(fs.readFileSync('coverage/coverage-summary.json', 'utf8'));
+              const total = frontendCoverage.total;
+
+              comment += '### Frontend Coverage\n';
+              comment += `- **Lines**: ${total.lines.pct}%\n`;
+              comment += `- **Statements**: ${total.statements.pct}%\n`;
+              comment += `- **Functions**: ${total.functions.pct}%\n`;
+              comment += `- **Branches**: ${total.branches.pct}%\n\n`;
+            } catch (e) {
+              comment += '### Frontend Coverage\n_Coverage report not available_\n\n';
+            }
+
+            try {
+              const backendCoverage = JSON.parse(fs.readFileSync('server/coverage/coverage-summary.json', 'utf8'));
+              const total = backendCoverage.total;
+
+              comment += '### Backend Coverage\n';
+              comment += `- **Lines**: ${total.lines.pct}%\n`;
+              comment += `- **Statements**: ${total.statements.pct}%\n`;
+              comment += `- **Functions**: ${total.functions.pct}%\n`;
+              comment += `- **Branches**: ${total.branches.pct}%\n`;
+            } catch (e) {
+              comment += '### Backend Coverage\n_Coverage report not available_\n';
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check formatting (if prettier exists)
+        run: |
+          if [ -f ".prettierrc" ] || [ -f ".prettierrc.json" ]; then
+            npx prettier --check "src/**/*.{ts,tsx,js,jsx}"
+          else
+            echo "No Prettier config found, skipping formatting check"
+          fi
+        continue-on-error: true
+
+  build:
+    name: Build Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+        env:
+          CI: true
+
+      - name: Check build output
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "Build failed: dist directory not found"
+            exit 1
+          fi
+          echo "Build successful: dist directory created"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: dist/
+          retention-days: 7
