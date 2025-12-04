@@ -5,6 +5,7 @@ import WeatherInfo from './components/WeatherInfo';
 import RainLegend from './components/RainLegend';
 import SettingsModal from './components/SettingsModal';
 import TerminalBadge from './components/TerminalBadge';
+import { IOSInstallPrompt } from './components/IOSInstallPrompt';
 import { radarLocations } from './data/radarLocations';
 import { RadarLocation, WeatherData, RadarRange, RadarOverlays, RadarMode } from './types/radar';
 import {
@@ -279,10 +280,10 @@ function RadarApp() {
   // Manual fallback to next nearest radar
   const handleTryNextNearest = () => {
     if (!userLocation || !selectedRadar) return;
-    
+
     const nearestRadars = findNearestRadars(userLocation.lat, userLocation.lng, radarLocations, 10);
     const nextRadar = nearestRadars.find(radar => radar.productId !== selectedRadar.productId);
-    
+
     if (nextRadar) {
       setSelectedRadar(nextRadar);
       setRadarError(null);
@@ -322,7 +323,7 @@ function RadarApp() {
                   >
                     <div className="linkedin-pulse flex items-center">
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                       </svg>
                     </div>
                   </a>
@@ -435,122 +436,122 @@ function RadarApp() {
 
           {/* 2-Column Layout for Desktop, Single Column for Mobile/Tablet */}
           <div className="flex-1 min-h-0 flex flex-row gap-4">
-          {/* Left Sidebar - Weather + Legend (Desktop Only) */}
-          <aside className="hidden lg:flex flex-col gap-2 w-64 xl:w-80 overflow-y-auto shrink-0">
-            <WeatherInfo
-              weatherData={weatherData}
-              loading={isLoadingWeather}
-              error={weatherError}
-              isDarkMode={isDarkMode}
-            />
-            <RainLegend isDarkMode={isDarkMode} inline={false} />
-          </aside>
+            {/* Left Sidebar - Weather + Legend (Desktop Only) */}
+            <aside className="hidden lg:flex flex-col gap-2 w-64 xl:w-80 overflow-y-auto shrink-0">
+              <WeatherInfo
+                weatherData={weatherData}
+                loading={isLoadingWeather}
+                error={weatherError}
+                isDarkMode={isDarkMode}
+              />
+              <RainLegend isDarkMode={isDarkMode} inline={false} />
+            </aside>
 
-          {/* Center - Radar Viewer */}
-          <div className="flex-1 min-w-0 flex flex-col">
-            {/* Error Banner */}
-            {radarError && selectedRadar && (
-              <div className={`mb-2 p-3 rounded-lg border ${isDarkMode ? 'bg-red-900/20 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-800'}`}>
-                <div className="flex flex-col gap-3">
-                  <p className="font-medium">{radarError}</p>
+            {/* Center - Radar Viewer */}
+            <div className="flex-1 min-w-0 flex flex-col">
+              {/* Error Banner */}
+              {radarError && selectedRadar && (
+                <div className={`mb-2 p-3 rounded-lg border ${isDarkMode ? 'bg-red-900/20 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-800'}`}>
+                  <div className="flex flex-col gap-3">
+                    <p className="font-medium">{radarError}</p>
 
-                  <div className="flex flex-wrap gap-2">
-                    {userLocation && (
-                      <button
-                        onClick={handleTryNextNearest}
-                        className={`px-3 py-1.5 text-xs rounded transition font-medium ${isDarkMode ? 'bg-orange-600 text-white hover:bg-orange-700' : 'bg-orange-500 text-white hover:bg-orange-600'}`}
-                      >
-                        🔄 Next Nearest to You
-                      </button>
-                    )}
+                    <div className="flex flex-wrap gap-2">
+                      {userLocation && (
+                        <button
+                          onClick={handleTryNextNearest}
+                          className={`px-3 py-1.5 text-xs rounded transition font-medium ${isDarkMode ? 'bg-orange-600 text-white hover:bg-orange-700' : 'bg-orange-500 text-white hover:bg-orange-600'}`}
+                        >
+                          🔄 Next Nearest to You
+                        </button>
+                      )}
 
-                    {nearestToRadar.length > 0 && (
-                      <button
-                        onClick={() => {
-                          setSelectedRadar(nearestToRadar[0]);
-                          setRadarError(null);
-                        }}
-                        className={`px-3 py-1.5 text-xs rounded transition font-medium ${isDarkMode ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-purple-500 text-white hover:bg-purple-600'}`}
-                      >
-                        🎯 Next Nearest to {selectedRadar.name}
-                      </button>
-                    )}
-                  </div>
+                      {nearestToRadar.length > 0 && (
+                        <button
+                          onClick={() => {
+                            setSelectedRadar(nearestToRadar[0]);
+                            setRadarError(null);
+                          }}
+                          className={`px-3 py-1.5 text-xs rounded transition font-medium ${isDarkMode ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-purple-500 text-white hover:bg-purple-600'}`}
+                        >
+                          🎯 Next Nearest to {selectedRadar.name}
+                        </button>
+                      )}
+                    </div>
 
-                  <div className="flex flex-col gap-2">
-                    {userLocation && nearestRadars.length > 0 && (
-                      <div className="flex flex-col gap-1">
-                        <span className={`text-sm font-medium ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>
-                          📍 Nearest to your location:
-                        </span>
-                        <div className="flex flex-wrap gap-2">
-                          {nearestRadars.slice(0, 3).map((radar) => (
-                            <button
-                              key={`user-${radar.productId}`}
-                              onClick={() => {
-                                setSelectedRadar(radar);
-                                setRadarError(null);
-                              }}
-                              className={`px-3 py-1.5 text-xs rounded transition ${isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
-                            >
-                              {radar.name} ({radar.distance}km)
-                            </button>
-                          ))}
+                    <div className="flex flex-col gap-2">
+                      {userLocation && nearestRadars.length > 0 && (
+                        <div className="flex flex-col gap-1">
+                          <span className={`text-sm font-medium ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>
+                            📍 Nearest to your location:
+                          </span>
+                          <div className="flex flex-wrap gap-2">
+                            {nearestRadars.slice(0, 3).map((radar) => (
+                              <button
+                                key={`user-${radar.productId}`}
+                                onClick={() => {
+                                  setSelectedRadar(radar);
+                                  setRadarError(null);
+                                }}
+                                className={`px-3 py-1.5 text-xs rounded transition ${isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+                              >
+                                {radar.name} ({radar.distance}km)
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {nearestToRadar.length > 0 && (
-                      <div className="flex flex-col gap-1">
-                        <span className={`text-sm font-medium ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>
-                          🎯 Nearest to {selectedRadar.name}:
-                        </span>
-                        <div className="flex flex-wrap gap-2">
-                          {nearestToRadar.slice(0, 3).map((radar) => (
-                            <button
-                              key={`radar-${radar.productId}`}
-                              onClick={() => {
-                                setSelectedRadar(radar);
-                                setRadarError(null);
-                              }}
-                              className={`px-3 py-1.5 text-xs rounded transition ${isDarkMode ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-purple-500 text-white hover:bg-purple-600'}`}
-                            >
-                              {radar.name} ({radar.distance}km)
-                            </button>
-                          ))}
+                      {nearestToRadar.length > 0 && (
+                        <div className="flex flex-col gap-1">
+                          <span className={`text-sm font-medium ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>
+                            🎯 Nearest to {selectedRadar.name}:
+                          </span>
+                          <div className="flex flex-wrap gap-2">
+                            {nearestToRadar.slice(0, 3).map((radar) => (
+                              <button
+                                key={`radar-${radar.productId}`}
+                                onClick={() => {
+                                  setSelectedRadar(radar);
+                                  setRadarError(null);
+                                }}
+                                className={`px-3 py-1.5 text-xs rounded transition ${isDarkMode ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-purple-500 text-white hover:bg-purple-600'}`}
+                              >
+                                {radar.name} ({radar.distance}km)
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="flex-1 min-h-0">
-              {selectedRadar ? (
-                <RadarViewer
-                  key={selectedRadar.baseId}
-                  baseId={selectedRadar.baseId}
-                  isDarkMode={isDarkMode}
-                  selectedRange={selectedRange}
-                  onRangeChange={setSelectedRange}
-                  currentMode={radarMode}
-                  onModeChange={setRadarMode}
-                  hasDoppler={selectedRadar.hasDoppler}
-                  dopplerProductId={selectedRadar.dopplerProductId}
-                  overlays={overlays}
-                  onError={handleRadarError}
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full">
-                  <div className={`text-xl ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Detecting your location...
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
+
+              <div className="flex-1 min-h-0">
+                {selectedRadar ? (
+                  <RadarViewer
+                    key={selectedRadar.baseId}
+                    baseId={selectedRadar.baseId}
+                    isDarkMode={isDarkMode}
+                    selectedRange={selectedRange}
+                    onRangeChange={setSelectedRange}
+                    currentMode={radarMode}
+                    onModeChange={setRadarMode}
+                    hasDoppler={selectedRadar.hasDoppler}
+                    dopplerProductId={selectedRadar.dopplerProductId}
+                    overlays={overlays}
+                    onError={handleRadarError}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <div className={`text-xl ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Detecting your location...
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
         </div>
       </main>
 
@@ -590,6 +591,8 @@ function RadarApp() {
         isDarkMode={isDarkMode}
         onDarkModeChange={setIsDarkMode}
       />
+
+      <IOSInstallPrompt isDarkMode={isDarkMode} />
     </div>
   );
 }
