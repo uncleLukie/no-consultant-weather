@@ -8,7 +8,7 @@ import {
 } from './weatherApi';
 
 // Mock fetch
-global.fetch = vi.fn();
+window.fetch = vi.fn();
 
 describe('weatherApi', () => {
   beforeEach(() => {
@@ -38,7 +38,7 @@ describe('weatherApi', () => {
         },
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (window.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => mockData,
       });
@@ -46,13 +46,13 @@ describe('weatherApi', () => {
       const result = await fetchWeatherData(-27.4698, 153.0251);
 
       expect(result).toEqual(mockData);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(window.fetch).toHaveBeenCalledWith(
         'http://localhost:3001/api/weather?lat=-27.4698&lng=153.0251'
       );
     });
 
     it('should throw error when API returns non-ok status with error message', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (window.fetch as any).mockResolvedValueOnce({
         ok: false,
         status: 404,
         statusText: 'Not Found',
@@ -63,7 +63,7 @@ describe('weatherApi', () => {
     });
 
     it('should throw error when API returns non-ok status without error message', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (window.fetch as any).mockResolvedValueOnce({
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
@@ -78,7 +78,7 @@ describe('weatherApi', () => {
     });
 
     it('should throw error when location data is missing', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (window.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           observations: {},
@@ -92,7 +92,7 @@ describe('weatherApi', () => {
     });
 
     it('should throw error on network failure', async () => {
-      (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
+      (window.fetch as any).mockRejectedValueOnce(new Error('Network error'));
 
       await expect(fetchWeatherData(-27.4698, 153.0251)).rejects.toThrow('Network error');
     });
@@ -108,17 +108,17 @@ describe('weatherApi', () => {
         },
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (window.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => mockData,
       });
 
       await fetchWeatherData(-27.46975123, 153.02512456);
 
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(window.fetch).toHaveBeenCalledWith(
         expect.stringContaining('lat=-27.46975123')
       );
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(window.fetch).toHaveBeenCalledWith(
         expect.stringContaining('lng=153.02512456')
       );
     });

@@ -18,7 +18,7 @@ export default function TerminalBadge({ isDarkMode, onTextLengthChange }: Termin
   }, [displayText, onTextLengthChange]);
 
   useEffect(() => {
-    let timeout: number;
+    let timeout: ReturnType<typeof setTimeout>;
 
     const randomDelay = (min: number, max: number) =>
       Math.floor(Math.random() * (max - min + 1)) + min;

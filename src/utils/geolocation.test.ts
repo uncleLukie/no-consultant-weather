@@ -72,7 +72,7 @@ describe('geolocation utils', () => {
       };
 
       (navigator.geolocation.getCurrentPosition as any) = vi.fn(
-        (success: PositionCallback, error: PositionErrorCallback) => {
+        (_success: PositionCallback, error: PositionErrorCallback) => {
           error(mockError as GeolocationPositionError);
         }
       );
@@ -90,7 +90,7 @@ describe('geolocation utils', () => {
       };
 
       (navigator.geolocation.getCurrentPosition as any) = vi.fn(
-        (success: PositionCallback, error: PositionErrorCallback) => {
+        (_success: PositionCallback, error: PositionErrorCallback) => {
           error(mockError as GeolocationPositionError);
         }
       );
@@ -108,7 +108,7 @@ describe('geolocation utils', () => {
       };
 
       (navigator.geolocation.getCurrentPosition as any) = vi.fn(
-        (success: PositionCallback, error: PositionErrorCallback) => {
+        (_success: PositionCallback, error: PositionErrorCallback) => {
           error(mockError as GeolocationPositionError);
         }
       );
@@ -126,7 +126,7 @@ describe('geolocation utils', () => {
       };
 
       (navigator.geolocation.getCurrentPosition as any) = vi.fn(
-        (success: PositionCallback, error: PositionErrorCallback) => {
+        (_success: PositionCallback, error: PositionErrorCallback) => {
           error(mockError as GeolocationPositionError);
         }
       );
@@ -184,7 +184,9 @@ describe('geolocation utils', () => {
         name: 'Brisbane',
         location: 'Marburg',
         state: 'QLD',
+        baseId: '66',
         productId: 'IDR663',
+        hasDoppler: true,
         lat: -27.6081,
         lng: 152.5400,
       },
@@ -193,7 +195,9 @@ describe('geolocation utils', () => {
         name: 'Sydney',
         location: 'Terrey Hills',
         state: 'NSW',
+        baseId: '71',
         productId: 'IDR713',
+        hasDoppler: true,
         lat: -33.7008,
         lng: 151.2100,
       },
@@ -202,7 +206,9 @@ describe('geolocation utils', () => {
         name: 'Melbourne',
         location: 'Laverton',
         state: 'VIC',
+        baseId: '50',
         productId: 'IDR503',
+        hasDoppler: true,
         lat: -37.8569,
         lng: 144.7553,
       },

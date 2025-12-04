@@ -3,7 +3,7 @@ import { fetchRadarImages, formatTimestamp, buildProductId } from './radarApi';
 import { RadarMode, RadarRange } from '../types/radar';
 
 // Mock fetch
-global.fetch = vi.fn();
+window.fetch = vi.fn();
 
 describe('radarApi', () => {
   beforeEach(() => {
@@ -25,7 +25,7 @@ describe('radarApi', () => {
         ],
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (window.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -33,13 +33,13 @@ describe('radarApi', () => {
       const result = await fetchRadarImages('IDR663');
 
       expect(result).toEqual(mockResponse.images);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(window.fetch).toHaveBeenCalledWith(
         'http://localhost:3001/api/radar/IDR663'
       );
     });
 
     it('should throw error when API returns non-ok status', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (window.fetch as any).mockResolvedValueOnce({
         ok: false,
         status: 404,
         statusText: 'Not Found',
@@ -50,7 +50,7 @@ describe('radarApi', () => {
     });
 
     it('should throw error when API returns non-ok status without error message', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (window.fetch as any).mockResolvedValueOnce({
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
@@ -61,7 +61,7 @@ describe('radarApi', () => {
     });
 
     it('should throw error when no images are returned', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (window.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ images: [] }),
       });
@@ -70,7 +70,7 @@ describe('radarApi', () => {
     });
 
     it('should throw error when images property is missing', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (window.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({}),
       });
@@ -79,7 +79,7 @@ describe('radarApi', () => {
     });
 
     it('should throw error on network failure', async () => {
-      (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
+      (window.fetch as any).mockRejectedValueOnce(new Error('Network error'));
 
       await expect(fetchRadarImages('IDR663')).rejects.toThrow('Network error');
     });
