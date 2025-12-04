@@ -39,6 +39,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "@vitest/coverage-v8": "^4.0.15",
     "@vitest/ui": "^4.0.15",
     "autoprefixer": "^10.4.22",
     "happy-dom": "^20.0.11",
