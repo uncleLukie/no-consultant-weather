@@ -206,10 +206,10 @@ export default function SettingsModal({
               </label>
             </div>
           </div>
-        </div>
+          </div>
 
         {/* Install App Section */}
-        <div>
+        <div className="px-6 py-3 sm:py-5">
           <h3
             className={`text-sm font-semibold uppercase tracking-wide mb-3 ${pendingDarkMode ? 'text-gray-400' : 'text-gray-600'
               }`}
@@ -241,24 +241,23 @@ export default function SettingsModal({
             </svg>
           </button>
         </div>
-      </div>
 
-      {/* Footer */}
-      <div
-        className={`px-6 py-4 border-t ${pendingDarkMode ? 'border-gray-700' : 'border-gray-200'
-          }`}
-      >
-        <button
-          onClick={handleClose}
-          className={`w-full py-2.5 rounded font-medium transition ${pendingDarkMode
-              ? 'bg-blue-600 hover:bg-blue-700 text-white'
-              : 'bg-blue-500 hover:bg-blue-600 text-white'
+        {/* Footer */}
+        <div
+          className={`px-6 py-4 border-t ${pendingDarkMode ? 'border-gray-700' : 'border-gray-200'
             }`}
         >
-          Close
-        </button>
+          <button
+            onClick={handleClose}
+            className={`w-full py-2.5 rounded font-medium transition ${pendingDarkMode
+                ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                : 'bg-blue-500 hover:bg-blue-600 text-white'
+              }`}
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
-    </div >
   );
 }
