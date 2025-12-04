@@ -1,0 +1,20 @@
+{
+    "name": "No-Consultant Weather",
+    "short_name": "NC Weather",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#111827",
+    "theme_color": "#111827",
+    "icons": [
+        {
+            "src": "/thunder.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/thunder.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
