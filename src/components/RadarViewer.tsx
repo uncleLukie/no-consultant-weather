@@ -96,14 +96,6 @@ export function RadarViewer({
     setIsPlaying(false);
   }, [loadImages]);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className={`text-xl ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Loading radar data...</div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -131,9 +123,9 @@ export function RadarViewer({
   const transparencyBaseUrl = `https://reg.bom.gov.au/products/radar_transparencies/${overlayProductId}`;
 
   return (
-    <div className="h-full flex flex-col overflow-y-auto items-start">
+    <div className="h-full flex flex-col overflow-y-auto items-center">
       {/* Radar Controls */}
-      <div className="w-full max-w-[calc(100vh-12rem)]">
+      <div className="w-full max-w-[calc(100vh-18rem)]">
         <RadarControlBar
           currentRange={selectedRange}
           onRangeChange={onRangeChange}
@@ -144,60 +136,73 @@ export function RadarViewer({
         />
       </div>
 
-      {/* Radar Image with Overlays */}
-      <div className={`w-full max-w-[calc(100vh-12rem)] rounded-b overflow-hidden shadow relative ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`} style={{ aspectRatio: '1' }}>
-        {/* Base layers - UNDER the radar image */}
-        {overlays.background && (
-          <img
-            src={`${transparencyBaseUrl}.background.png`}
-            alt="Background overlay"
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{ zIndex: 1, objectPosition: 'center' }}
-          />
-        )}
-        {overlays.topography && (
-          <img
-            src={`${transparencyBaseUrl}.topography.png`}
-            alt="Topography overlay"
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{ zIndex: 2, objectPosition: 'center' }}
-          />
-        )}
-        {overlays.catchments && (
-          <img
-            src={`${transparencyBaseUrl}.catchments.png`}
-            alt="Catchments overlay"
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{ zIndex: 3, objectPosition: 'center' }}
-          />
-        )}
+      {
+        isLoading ?
+            (
+            <div className={`w-full max-w-[calc(100vh-18rem)] rounded-b flex items-center justify-center mx-auto ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'}`} style={{ aspectRatio: '1' }}>
+              <div className={`text-xl font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Loading radar data...</div>
+            </div>
+            )
+            :
+            (
+            <>
+              {/* Radar Image with Overlays */}
+              <div className={`w-full max-w-[calc(100vh-18rem)] rounded-b overflow-hidden shadow relative mx-auto ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`} style={{ aspectRatio: '1' }}>
+                {/* Base layers - UNDER the radar image */}
+                {overlays.background && (
+                    <img
+                        src={`${transparencyBaseUrl}.background.png`}
+                        alt="Background overlay"
+                        className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+                        style={{ zIndex: 1, objectPosition: 'center' }}
+                    />
+                )}
+                {overlays.topography && (
+                    <img
+                        src={`${transparencyBaseUrl}.topography.png`}
+                        alt="Topography overlay"
+                        className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+                        style={{ zIndex: 2, objectPosition: 'center' }}
+                    />
+                )}
+                {overlays.catchments && (
+                    <img
+                        src={`${transparencyBaseUrl}.catchments.png`}
+                        alt="Catchments overlay"
+                        className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+                        style={{ zIndex: 3, objectPosition: 'center' }}
+                    />
+                )}
 
-        {/* Radar image - the rain data */}
-        <img
-          src={currentImage.url}
-          alt={`Radar loop frame ${currentIndex + 1}`}
-          className="absolute inset-0 w-full h-full object-contain block"
-          style={{ zIndex: 4, objectPosition: 'center' }}
-        />
+                {/* Radar image - the rain data */}
+                <img
+                    src={currentImage.url}
+                    alt={`Radar loop frame ${currentIndex + 1}`}
+                    className="absolute inset-0 w-full h-full object-contain block"
+                    style={{ zIndex: 4, objectPosition: 'center' }}
+                />
 
-        {/* Top layers - ON TOP of the radar image */}
-        {overlays.range && (
-          <img
-            src={`${transparencyBaseUrl}.range.png`}
-            alt="Range rings overlay"
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{ zIndex: 5, objectPosition: 'center' }}
-          />
-        )}
-        {overlays.locations && (
-          <img
-            src={`${transparencyBaseUrl}.locations.png`}
-            alt="Locations overlay"
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{ zIndex: 6, objectPosition: 'center' }}
-          />
-        )}
-      </div>
+                {/* Top layers - ON TOP of the radar image */}
+                {overlays.range && (
+                    <img
+                        src={`${transparencyBaseUrl}.range.png`}
+                        alt="Range rings overlay"
+                        className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+                        style={{ zIndex: 5, objectPosition: 'center' }}
+                    />
+                )}
+                {overlays.locations && (
+                    <img
+                        src={`${transparencyBaseUrl}.locations.png`}
+                        alt="Locations overlay"
+                        className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+                        style={{ zIndex: 6, objectPosition: 'center' }}
+                    />
+                )}
+              </div>
+            </>
+            )
+      }
 
       {/* Rain Rate Legend - Mobile/Tablet Only */}
       <div className="lg:hidden">
@@ -205,48 +210,54 @@ export function RadarViewer({
       </div>
 
       {/* Time and Frame Info */}
-      <div className={`mt-2 text-center w-full max-w-[calc(100vh-12rem)] ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-        <div className="text-sm md:text-base font-medium">
-          {formatTimestamp(currentImage.timestamp)}
-        </div>
-        <div className={`text-xs md:text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-          Frame {currentIndex + 1} / {images.length}
-        </div>
-      </div>
+      {
+        !isLoading &&
+          <div className={`mt-2 text-center w-full max-w-[calc(100vh-12rem)] ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <div className="text-sm md:text-base font-medium h-6">
+              {formatTimestamp(currentImage.timestamp)}
+            </div>
+            <div className={`text-xs md:text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              Frame {currentIndex + 1} / {images.length}
+            </div>
+          </div>
+      }
 
       {/* Playback Controls */}
-      <div className="mt-2 flex items-center justify-center gap-2 flex-wrap w-full max-w-[calc(100vh-12rem)]">
-        <button
-          onClick={handlePrevious}
-          className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-sm font-medium whitespace-nowrap"
-          disabled={images.length <= 1}
-        >
-          ◀ Prev
-        </button>
+      {
+        !isLoading &&
+          <div className="mt-2 flex items-center justify-center gap-2 flex-wrap w-full max-w-[calc(100vh-12rem)]">
+            <button
+                onClick={handlePrevious}
+                className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-sm font-medium whitespace-nowrap"
+                disabled={images.length <= 1}
+            >
+              ◀ Prev
+            </button>
 
-        <button
-          onClick={() => setIsPlaying(!isPlaying)}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm font-semibold whitespace-nowrap"
-        >
-          {isPlaying ? '⏸ Pause' : '▶ Play'}
-        </button>
+            <button
+                onClick={() => setIsPlaying(!isPlaying)}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm font-semibold whitespace-nowrap"
+            >
+              {isPlaying ? '⏸ Pause' : '▶ Play'}
+            </button>
 
-        <button
-          onClick={handleNext}
-          className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-sm font-medium whitespace-nowrap"
-          disabled={images.length <= 1}
-        >
-          Next ▶
-        </button>
+            <button
+                onClick={handleNext}
+                className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-sm font-medium whitespace-nowrap"
+                disabled={images.length <= 1}
+            >
+              Next ▶
+            </button>
 
-        <button
-          onClick={handleLatest}
-          className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition text-sm font-medium whitespace-nowrap"
-          disabled={images.length <= 1 || currentIndex === images.length - 1}
-        >
-          Latest
-        </button>
-      </div>
+            <button
+                onClick={handleLatest}
+                className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition text-sm font-medium whitespace-nowrap"
+                disabled={images.length <= 1 || currentIndex === images.length - 1}
+            >
+              Latest
+            </button>
+          </div>
+      }
     </div>
   );
 }
