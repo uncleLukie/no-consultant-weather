@@ -4,7 +4,6 @@ import { RadarViewer } from './components/RadarViewer';
 import WeatherInfo from './components/WeatherInfo';
 import RainLegend from './components/RainLegend';
 import SettingsModal from './components/SettingsModal';
-import TerminalBadge from './components/TerminalBadge';
 import { IOSInstallPrompt } from './components/IOSInstallPrompt';
 import { radarLocations } from './data/radarLocations';
 import { RadarLocation, WeatherData, RadarRange, RadarOverlays, RadarMode } from './types/radar';
@@ -50,7 +49,6 @@ function RadarApp() {
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isInstallPromptOpen, setIsInstallPromptOpen] = useState(false);
-  const [terminalTextLength, setTerminalTextLength] = useState(0);
 
   // Listen for custom event to open install prompt
   useEffect(() => {
@@ -326,26 +324,19 @@ function RadarApp() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`p-1.5 rounded hover:bg-opacity-80 transition ${isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-200'}`}
-                    aria-label="LinkedIn Profile - Open to Work"
-                    title="LinkedIn - #OpenToWork"
+                    aria-label="LinkedIn Profile"
+                    title="LinkedIn"
                   >
-                    <div className="linkedin-pulse flex items-center">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                      </svg>
-                    </div>
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                    </svg>
                   </a>
-                  <TerminalBadge
-                    isDarkMode={isDarkMode}
-                    onTextLengthChange={setTerminalTextLength}
-                  />
                 </div>
               </div>
 
               {/* Title - Center */}
               <h1
-                className={`flex items-center gap-2 text-base md:text-lg font-bold whitespace-nowrap title-smooth-bump ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
-                style={{ transform: `translateX(${terminalTextLength * 6}px)` }}
+                className={`flex items-center gap-2 text-base md:text-lg font-bold whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
               >
                 <img src="/thunder.png" alt="Thunder icon" className="w-6 h-6 md:w-7 md:h-7" />
                 <span className="font-sans min-[450px]:hidden">NCW</span>
