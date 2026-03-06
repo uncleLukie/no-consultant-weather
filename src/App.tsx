@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Routes, Route, useParams, useNavigate } from 'react-router-dom';
 import { RadarViewer } from './components/RadarViewer';
+import RadarControlBar from './components/RadarControlBar';
 import WeatherInfo from './components/WeatherInfo';
 import RainLegend from './components/RainLegend';
 import SettingsModal from './components/SettingsModal';
@@ -300,74 +301,19 @@ function RadarApp() {
     <div className={`h-screen flex flex-col ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Center-Aligned Header */}
       <header className={`shadow-sm border-b ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className="max-w-screen-xl mx-auto px-2 py-2 sm:px-4 sm:py-3 xl:px-12">
-          <div className="flex flex-col items-center gap-2">
-            {/* Top Row: Title and Controls */}
-            <div className="flex items-center justify-center gap-3 w-full relative">
-              {/* Social Icons - Left */}
-              <div className="absolute left-0 xl:left-8 flex items-center gap-2">
-                <a
-                  href="https://github.com/uncleLukie/no-consultant-weather"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`p-1.5 rounded hover:bg-opacity-80 transition ${isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-200'}`}
-                  aria-label="GitHub Repository"
-                  title="GitHub"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
-                  </svg>
-                </a>
-                <div className="relative flex items-center">
-                  <a
-                    href="https://www.linkedin.com/in/unclelukie/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`p-1.5 rounded hover:bg-opacity-80 transition ${isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-200'}`}
-                    aria-label="LinkedIn Profile"
-                    title="LinkedIn"
-                  >
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
+        <div className="w-full px-2 py-1.5 sm:px-4 sm:py-2">
+          <div className="flex items-center justify-between gap-4 max-w-[100vw] overflow-hidden">
+            {/* Left: Title */}
+            <h1
+              className={`flex items-center gap-2 text-base md:text-lg font-bold whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+            >
+              <img src="/thunder.png" alt="Thunder icon" className="w-5 h-5 md:w-6 md:h-6" />
+              <span className="font-sans min-[450px]:hidden text-sm">NCW</span>
+              <span className="font-sans hidden min-[450px]:inline text-base">No-Consultant Weather</span>
+            </h1>
 
-              {/* Title - Center */}
-              <h1
-                className={`flex items-center gap-2 text-base md:text-lg font-bold whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
-              >
-                <img src="/thunder.png" alt="Thunder icon" className="w-6 h-6 md:w-7 md:h-7" />
-                <span className="font-sans min-[450px]:hidden">NCW</span>
-                <span className="font-sans hidden min-[450px]:inline">No-Consultant Weather</span>
-              </h1>
-
-              {/* Settings Button - Right */}
-              <button
-                onClick={() => setIsSettingsOpen(true)}
-                className={`absolute right-0 xl:right-8 p-2 rounded-lg transition hover:bg-opacity-10 ${isDarkMode ? 'hover:bg-white text-gray-300' : 'hover:bg-gray-900 text-gray-700'}`}
-                aria-label="Open settings"
-                title="Settings"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-5 h-5"
-                >
-                  <circle cx="12" cy="12" r="3" />
-                  <path d="M12 1v6m0 6v6m9-9h-6M7 12H1m15.36 7.36l-4.24-4.24m0-6.36l4.24-4.24M8.64 16.36l-4.24 4.24m0-16.72l4.24 4.24" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Radar Selector Row - Centered */}
-            <div className="flex items-center justify-center gap-2 w-full max-w-2xl">
+            {/* Center: Radar Selector */}
+            <div className="flex-1 flex items-center justify-center gap-2 max-w-xl">
               <select
                 id="radar-select"
                 value={selectedRadar?.productId || ''}
@@ -377,7 +323,7 @@ function RadarApp() {
                   );
                   if (radar) setSelectedRadar(radar);
                 }}
-                className={`flex-1 px-2 md:px-3 py-1.5 text-xs md:text-sm border focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                className={`flex-1 min-w-0 px-2 py-1 text-xs md:text-sm border focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
               >
                 <option value="" disabled>Select location...</option>
                 {nearestRadars.length > 0 && (
@@ -400,20 +346,48 @@ function RadarApp() {
                 ))}
               </select>
 
-              {/* Find Nearest Button */}
               <button
                 onClick={handleUseLocation}
                 disabled={isLoadingLocation}
-                className="px-2 md:px-3 py-1.5 text-xs md:text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-1"
+                className="px-2 py-1 text-xs md:text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-1"
               >
-                {isLoadingLocation ? (
-                  <span>...</span>
-                ) : (
-                  <>
-                    <span>📍</span>
-                    <span>Find Nearest</span>
-                  </>
-                )}
+                {isLoadingLocation ? '...' : '📍'}
+              </button>
+            </div>
+
+            {/* Right: Social & Settings */}
+            <div className="flex items-center gap-1 md:gap-3">
+              <a
+                href="https://github.com/uncleLukie/no-consultant-weather"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`p-1 rounded hover:bg-opacity-80 transition ${isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-200'}`}
+                aria-label="GitHub Repository"
+                title="GitHub"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
+                </svg>
+              </a>
+              <button
+                onClick={() => setIsSettingsOpen(true)}
+                className={`p-1.5 rounded-lg transition hover:bg-opacity-10 ${isDarkMode ? 'hover:bg-white text-gray-300' : 'hover:bg-gray-900 text-gray-700'}`}
+                aria-label="Open settings"
+                title="Settings"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-4 h-4 md:w-5 md:h-5"
+                >
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M12 1v6m0 6v6m9-9h-6M7 12H1m15.36 7.36l-4.24-4.24m0-6.36l4.24-4.24M8.64 16.36l-4.24 4.24m0-16.72l4.24 4.24" />
+                </svg>
               </button>
             </div>
           </div>
@@ -422,7 +396,7 @@ function RadarApp() {
 
       {/* Main Content - Responsive Layout */}
       <main className="flex-1 overflow-hidden flex flex-col">
-        <div className="flex-1 overflow-hidden flex flex-col max-w-screen-xl mx-auto w-full px-4 lg:px-8 xl:px-12">
+        <div className="flex-1 overflow-hidden flex flex-col w-full px-1 md:px-2">
           {/* Weather Banner - Mobile/Tablet Only */}
           <div className="lg:hidden">
             <WeatherInfo
@@ -433,98 +407,65 @@ function RadarApp() {
             />
           </div>
 
-          {/* 2-Column Layout for Desktop, Single Column for Mobile/Tablet */}
-          <div className="flex-1 min-h-0 flex flex-row gap-4">
+          {/* 3-Column Layout for Desktop, Single Column for Mobile/Tablet */}
+          <div className="flex-1 min-h-0 flex flex-row gap-2">
             {/* Left Sidebar - Weather + Legend (Desktop Only) */}
-            <aside className="hidden lg:flex flex-col gap-2 w-64 xl:w-80 overflow-y-auto shrink-0">
+            <aside className="hidden lg:flex flex-col gap-2 w-64 xl:w-72 overflow-y-auto shrink-0 py-2">
               <WeatherInfo
                 weatherData={weatherData}
                 loading={isLoadingWeather}
                 error={weatherError}
                 isDarkMode={isDarkMode}
               />
-              <RainLegend isDarkMode={isDarkMode} inline={false} />
+              <div className="mt-auto">
+                <RainLegend isDarkMode={isDarkMode} inline={false} />
+              </div>
             </aside>
 
             {/* Center - Radar Viewer */}
-            <div className="flex-1 min-w-0 flex flex-col">
+            <div className="flex-1 min-w-0 flex flex-col py-1">
               {/* Error Banner */}
               {radarError && selectedRadar && (
-                <div className={`mb-2 p-3 rounded-lg border ${isDarkMode ? 'bg-red-900/20 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-800'}`}>
-                  <div className="flex flex-col gap-3">
+                <div className={`mb-2 p-2 rounded-lg border text-sm ${isDarkMode ? 'bg-red-900/20 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-800'}`}>
+                  <div className="flex flex-col gap-2">
                     <p className="font-medium">{radarError}</p>
-
                     <div className="flex flex-wrap gap-2">
                       {userLocation && (
                         <button
                           onClick={handleTryNextNearest}
-                          className={`px-3 py-1.5 text-xs rounded transition font-medium ${isDarkMode ? 'bg-orange-600 text-white hover:bg-orange-700' : 'bg-orange-500 text-white hover:bg-orange-600'}`}
+                          className="px-2 py-1 bg-orange-600 text-white rounded text-xs"
                         >
                           🔄 Next Nearest to You
                         </button>
                       )}
-
-                      {nearestToRadar.length > 0 && (
-                        <button
-                          onClick={() => {
-                            setSelectedRadar(nearestToRadar[0]);
-                            setRadarError(null);
-                          }}
-                          className={`px-3 py-1.5 text-xs rounded transition font-medium ${isDarkMode ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-purple-500 text-white hover:bg-purple-600'}`}
-                        >
-                          🎯 Next Nearest to {selectedRadar.name}
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      {userLocation && nearestRadars.length > 0 && (
-                        <div className="flex flex-col gap-1">
-                          <span className={`text-sm font-medium ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>
-                            📍 Nearest to your location:
-                          </span>
-                          <div className="flex flex-wrap gap-2">
-                            {nearestRadars.slice(0, 3).map((radar) => (
-                              <button
-                                key={`user-${radar.productId}`}
-                                onClick={() => {
-                                  setSelectedRadar(radar);
-                                  setRadarError(null);
-                                }}
-                                className={`px-3 py-1.5 text-xs rounded transition ${isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
-                              >
-                                {radar.name} ({radar.distance}km)
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {nearestToRadar.length > 0 && (
-                        <div className="flex flex-col gap-1">
-                          <span className={`text-sm font-medium ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>
-                            🎯 Nearest to {selectedRadar.name}:
-                          </span>
-                          <div className="flex flex-wrap gap-2">
-                            {nearestToRadar.slice(0, 3).map((radar) => (
-                              <button
-                                key={`radar-${radar.productId}`}
-                                onClick={() => {
-                                  setSelectedRadar(radar);
-                                  setRadarError(null);
-                                }}
-                                className={`px-3 py-1.5 text-xs rounded transition ${isDarkMode ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-purple-500 text-white hover:bg-purple-600'}`}
-                              >
-                                {radar.name} ({radar.distance}km)
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                      <button
+                        onClick={() => {
+                          setSelectedRadar(nearestToRadar[0]);
+                          setRadarError(null);
+                        }}
+                        className="px-2 py-1 bg-purple-600 text-white rounded text-xs"
+                      >
+                        🎯 Next Nearest to {selectedRadar.name}
+                      </button>
                     </div>
                   </div>
                 </div>
               )}
+
+              {/* Range Buttons (Above radar on smaller screens) */}
+              <div className="xl:hidden w-full mb-1">
+                {selectedRadar && (
+                  <RadarControlBar
+                    currentRange={selectedRange}
+                    onRangeChange={setSelectedRange}
+                    currentMode={radarMode}
+                    onModeChange={setRadarMode}
+                    hasDoppler={selectedRadar.hasDoppler}
+                    isDarkMode={isDarkMode}
+                    orientation="horizontal"
+                  />
+                )}
+              </div>
 
               <div className="flex-1 min-h-0">
                 {selectedRadar ? (
@@ -533,10 +474,7 @@ function RadarApp() {
                     baseId={selectedRadar.baseId}
                     isDarkMode={isDarkMode}
                     selectedRange={selectedRange}
-                    onRangeChange={setSelectedRange}
                     currentMode={radarMode}
-                    onModeChange={setRadarMode}
-                    hasDoppler={selectedRadar.hasDoppler}
                     dopplerProductId={selectedRadar.dopplerProductId}
                     overlays={overlays}
                     onError={handleRadarError}
@@ -550,36 +488,24 @@ function RadarApp() {
                 )}
               </div>
             </div>
+
+            {/* Right Sidebar - Controls (Extra Large Screens Only) */}
+            {selectedRadar && (
+              <aside className="hidden xl:flex flex-col gap-2 w-32 shrink-0 py-2">
+                <RadarControlBar
+                  currentRange={selectedRange}
+                  onRangeChange={setSelectedRange}
+                  currentMode={radarMode}
+                  onModeChange={setRadarMode}
+                  hasDoppler={selectedRadar.hasDoppler}
+                  isDarkMode={isDarkMode}
+                  orientation="vertical"
+                />
+              </aside>
+            )}
           </div>
         </div>
       </main>
-
-      {/* Compact Footer */}
-      <footer className={`py-1 border-t ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
-        <div className="max-w-screen-xl mx-auto px-2 xl:px-12 text-center">
-          <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-            Data from{' '}
-            <a
-              href="http://www.bom.gov.au/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`hover:underline ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
-            >
-              Australian Bureau of Meteorology
-            </a>
-            {' • '}
-            <a
-              href="https://www.flaticon.com/free-icons/rain"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`hover:underline ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
-              title="rain icons"
-            >
-              Icon by Freepik
-            </a>
-          </p>
-        </div>
-      </footer>
 
       {/* Settings Modal */}
       <SettingsModal

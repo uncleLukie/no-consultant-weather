@@ -206,40 +206,44 @@ export default function SettingsModal({
               </label>
             </div>
           </div>
-          </div>
 
-        {/* Install App Section */}
-        <div className="px-6 py-3 sm:py-5">
-          <h3
-            className={`text-sm font-semibold uppercase tracking-wide mb-3 ${pendingDarkMode ? 'text-gray-400' : 'text-gray-600'
-              }`}
-          >
-            Install App
-          </h3>
-          <button
-            onClick={() => {
-              // We need a way to trigger the prompt in App.tsx
-              // For now, we'll dispatch a custom event or use a callback prop if we could change the signature easily.
-              // Since we can't easily change the signature without touching App.tsx anyway, let's dispatch a custom event.
-              window.dispatchEvent(new CustomEvent('openInstallPrompt'));
-              handleClose();
-            }}
-            className={`w-full flex items-center justify-between p-3 rounded transition ${pendingDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'
-              }`}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">📱</span>
-              <div className="text-left">
-                <div className="font-medium">Add to Home Screen</div>
-                <div className={`text-xs ${pendingDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  Get the full app experience
-                </div>
-              </div>
+          {/* Credits Section */}
+          <div className={`pt-4 border-t ${pendingDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+            <h3
+              className={`text-sm font-semibold uppercase tracking-wide mb-2 ${pendingDarkMode ? 'text-gray-400' : 'text-gray-600'
+                }`}
+            >
+              Data & Credits
+            </h3>
+            <div className={`text-xs space-y-2 ${pendingDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              <p>
+                Data sourced from the{' '}
+                <a
+                  href="http://www.bom.gov.au/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`hover:underline font-medium ${pendingDarkMode ? 'text-blue-400' : 'text-blue-600'}`}
+                >
+                  Australian Bureau of Meteorology
+                </a>
+              </p>
+              <p>
+                Weather icon by{' '}
+                <a
+                  href="https://www.flaticon.com/free-icons/rain"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`hover:underline font-medium ${pendingDarkMode ? 'text-blue-400' : 'text-blue-600'}`}
+                  title="rain icons"
+                >
+                  Freepik from Flaticon
+                </a>
+              </p>
+              <p className="pt-2 italic">
+                No-Consultant Weather is an open-source project.
+              </p>
             </div>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-            </svg>
-          </button>
+          </div>
         </div>
 
         {/* Footer */}

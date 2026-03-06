@@ -2,16 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { RadarImage, RadarRange, RadarOverlays, RadarMode } from '../types/radar';
 import { fetchRadarImages, formatTimestamp, buildProductId } from '../utils/radarApi';
 import RainLegend from './RainLegend';
-import RadarControlBar from './RadarControlBar';
 
 interface RadarViewerProps {
   baseId: string;
   isDarkMode: boolean;
   selectedRange: RadarRange;
-  onRangeChange: (range: RadarRange) => void;
   currentMode: RadarMode;
-  onModeChange: (mode: RadarMode) => void;
-  hasDoppler: boolean;
   dopplerProductId?: string;
   overlays: RadarOverlays;
   onError?: (error: string | null) => void;
@@ -21,10 +17,7 @@ export function RadarViewer({
   baseId,
   isDarkMode,
   selectedRange,
-  onRangeChange,
   currentMode,
-  onModeChange,
-  hasDoppler,
   dopplerProductId,
   overlays,
   onError
@@ -33,7 +26,7 @@ export function RadarViewer({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
   // Generate current product ID based on mode and range
   const currentProductId = buildProductId(baseId, currentMode, selectedRange, dopplerProductId);
@@ -96,30 +89,6 @@ export function RadarViewer({
     setIsPlaying(false);
   }, [loadImages]);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className={`text-xl ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Loading radar data...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-xl text-red-600">{error}</div>
-      </div>
-    );
-  }
-
-  if (images.length === 0) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className={`text-xl ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>No radar data available</div>
-      </div>
-    );
-  }
-
   const currentImage = images[currentIndex];
 
   // For overlays, always use the rain radar product ID (128km default)
@@ -131,121 +100,133 @@ export function RadarViewer({
   const transparencyBaseUrl = `https://reg.bom.gov.au/products/radar_transparencies/${overlayProductId}`;
 
   return (
-    <div className="h-full flex flex-col overflow-y-auto items-start">
-      {/* Radar Controls */}
-      <div className="w-full max-w-[calc(100vh-12rem)]">
-        <RadarControlBar
-          currentRange={selectedRange}
-          onRangeChange={onRangeChange}
-          currentMode={currentMode}
-          onModeChange={onModeChange}
-          hasDoppler={hasDoppler}
-          isDarkMode={isDarkMode}
-        />
-      </div>
+    <div className="h-full flex flex-col items-center">
+      {/* Radar Image with Overlays - This should take maximum available space */}
+      <div className="flex-1 w-full min-h-0 flex flex-col items-center justify-center p-1 md:p-2 lg:p-4">
+        <div 
+          className={`relative w-full h-full max-w-full max-h-full rounded shadow-2xl overflow-hidden ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`} 
+          style={{ 
+            aspectRatio: '1',
+            maxHeight: 'calc(100vh - 180px)' // Account for header and controls
+          }}
+        >
+          {/* Subtle loading indicator overlay */}
+          {isLoading && (
+            <div className="absolute top-2 right-2 z-50 flex items-center gap-2 px-2 py-1 bg-black/50 backdrop-blur-sm rounded text-[10px] text-white">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+              Loading...
+            </div>
+          )}
 
-      {/* Radar Image with Overlays */}
-      <div className={`w-full max-w-[calc(100vh-12rem)] rounded-b overflow-hidden shadow relative ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`} style={{ aspectRatio: '1' }}>
-        {/* Base layers - UNDER the radar image */}
-        {overlays.background && (
-          <img
-            src={`${transparencyBaseUrl}.background.png`}
-            alt="Background overlay"
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{ zIndex: 1, objectPosition: 'center' }}
-          />
-        )}
-        {overlays.topography && (
-          <img
-            src={`${transparencyBaseUrl}.topography.png`}
-            alt="Topography overlay"
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{ zIndex: 2, objectPosition: 'center' }}
-          />
-        )}
-        {overlays.catchments && (
-          <img
-            src={`${transparencyBaseUrl}.catchments.png`}
-            alt="Catchments overlay"
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{ zIndex: 3, objectPosition: 'center' }}
-          />
-        )}
+          {/* Base layers - UNDER the radar image */}
+          {overlays.background && (
+            <img
+              src={`${transparencyBaseUrl}.background.png`}
+              alt="Background overlay"
+              className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+              style={{ zIndex: 1, objectPosition: 'center' }}
+            />
+          )}
+          {overlays.topography && (
+            <img
+              src={`${transparencyBaseUrl}.topography.png`}
+              alt="Topography overlay"
+              className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+              style={{ zIndex: 2, objectPosition: 'center' }}
+            />
+          )}
+          {overlays.catchments && (
+            <img
+              src={`${transparencyBaseUrl}.catchments.png`}
+              alt="Catchments overlay"
+              className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+              style={{ zIndex: 3, objectPosition: 'center' }}
+            />
+          )}
 
-        {/* Radar image - the rain data */}
-        <img
-          src={currentImage.url}
-          alt={`Radar loop frame ${currentIndex + 1}`}
-          className="absolute inset-0 w-full h-full object-contain block"
-          style={{ zIndex: 4, objectPosition: 'center' }}
-        />
+          {/* Radar image - the rain data */}
+          {images.length > 0 && currentImage && (
+            <img
+              src={currentImage.url}
+              alt={`Radar loop frame ${currentIndex + 1}`}
+              className="absolute inset-0 w-full h-full object-contain block"
+              style={{ zIndex: 4, objectPosition: 'center' }}
+            />
+          )}
 
-        {/* Top layers - ON TOP of the radar image */}
-        {overlays.range && (
-          <img
-            src={`${transparencyBaseUrl}.range.png`}
-            alt="Range rings overlay"
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{ zIndex: 5, objectPosition: 'center' }}
-          />
-        )}
-        {overlays.locations && (
-          <img
-            src={`${transparencyBaseUrl}.locations.png`}
-            alt="Locations overlay"
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{ zIndex: 6, objectPosition: 'center' }}
-          />
-        )}
-      </div>
-
-      {/* Rain Rate Legend - Mobile/Tablet Only */}
-      <div className="lg:hidden">
-        <RainLegend isDarkMode={isDarkMode} inline={true} />
-      </div>
-
-      {/* Time and Frame Info */}
-      <div className={`mt-2 text-center w-full max-w-[calc(100vh-12rem)] ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-        <div className="text-sm md:text-base font-medium">
-          {formatTimestamp(currentImage.timestamp)}
+          {/* Top layers - ON TOP of the radar image */}
+          {overlays.range && (
+            <img
+              src={`${transparencyBaseUrl}.range.png`}
+              alt="Range rings overlay"
+              className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+              style={{ zIndex: 5, objectPosition: 'center' }}
+            />
+          )}
+          {overlays.locations && (
+            <img
+              src={`${transparencyBaseUrl}.locations.png`}
+              alt="Locations overlay"
+              className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+              style={{ zIndex: 6, objectPosition: 'center' }}
+            />
+          )}
+          
+          {/* Time and Frame Info Overlay (instead of separate div) */}
+          <div className="absolute bottom-2 left-2 z-50 px-2 py-1 bg-black/40 backdrop-blur-sm rounded text-white text-xs md:text-sm">
+            {images.length > 0 && currentImage ? (
+              <>
+                <div className="font-bold">{formatTimestamp(currentImage.timestamp)}</div>
+                <div className="opacity-80">Frame {currentIndex + 1} / {images.length}</div>
+              </>
+            ) : (
+              <div>Loading...</div>
+            )}
+          </div>
         </div>
-        <div className={`text-xs md:text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-          Frame {currentIndex + 1} / {images.length}
-        </div>
       </div>
 
-      {/* Playback Controls */}
-      <div className="mt-2 flex items-center justify-center gap-2 flex-wrap w-full max-w-[calc(100vh-12rem)]">
+      {/* Playback Controls - Minimal padding */}
+      <div className="w-full lg:max-w-4xl px-2 py-1 flex items-center justify-center gap-1 md:gap-2 flex-wrap">
         <button
           onClick={handlePrevious}
-          className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-sm font-medium whitespace-nowrap"
+          className="p-2 md:px-4 md:py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-sm font-medium"
           disabled={images.length <= 1}
+          title="Previous Frame"
         >
-          ◀ Prev
+          <span className="md:hidden">◀</span>
+          <span className="hidden md:inline">◀ Prev</span>
         </button>
 
         <button
           onClick={() => setIsPlaying(!isPlaying)}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm font-semibold whitespace-nowrap"
+          className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm font-bold min-w-[100px]"
         >
           {isPlaying ? '⏸ Pause' : '▶ Play'}
         </button>
 
         <button
           onClick={handleNext}
-          className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-sm font-medium whitespace-nowrap"
+          className="p-2 md:px-4 md:py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-sm font-medium"
           disabled={images.length <= 1}
+          title="Next Frame"
         >
-          Next ▶
+          <span className="md:hidden">▶</span>
+          <span className="hidden md:inline">Next ▶</span>
         </button>
 
         <button
           onClick={handleLatest}
-          className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition text-sm font-medium whitespace-nowrap"
+          className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition text-sm font-medium"
           disabled={images.length <= 1 || currentIndex === images.length - 1}
         >
           Latest
         </button>
+      </div>
+
+      {/* Rain Rate Legend - Mobile/Tablet Only */}
+      <div className="lg:hidden w-full px-4">
+        <RainLegend isDarkMode={isDarkMode} inline={true} />
       </div>
     </div>
   );
