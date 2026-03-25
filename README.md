@@ -4,7 +4,7 @@ built this because the new Australian Bureau of Meteorology (BoM) website redesi
 
 no clutter. no consultants. just you and the radar.
 
-<img width="492" height="737" alt="image" src="https://github.com/user-attachments/assets/eb1a9f64-ea15-4493-a68f-422f6b13cf42" />
+<img width="1011" height="669" alt="image" src="https://github.com/user-attachments/assets/4ae0ed14-b957-4a59-9bda-846ec4ff10ba" />
 
 ## features
 - **smart location**: auto-detects your nearest radar via IP on first visit
@@ -17,10 +17,8 @@ no clutter. no consultants. just you and the radar.
 - **api proxy**: Express (BoM lacks a public json API and blocks CORS, so this tiny backend fetches their html, parses the image arrays, and serves them up nicely)
 
 ## run it locally
-you'll need node.js 18+. install dependencies for both folders first:
-
+you'll need node.js 18+. install dependencies for both root folder and server folder first:
 `npm install`
-`cd server && npm install && cd ..`
 
 
 then, fire up both environments:
@@ -28,11 +26,11 @@ then, fire up both environments:
 #### terminal 1 (backend proxy):
 `cd server`
 `npm run dev`
-# runs on localhost:3001
+runs on localhost:3001
 
 #### terminal 2 (frontend:
-npm run dev
-# runs on localhost:5173
+`npm run dev`
+runs on localhost:5173
 (need environment variables? just copy .env.example to .env. defaults work fine for local dev.)
 
 ## deployment
