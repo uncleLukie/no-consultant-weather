@@ -39,3 +39,6 @@ live site is pushing to Cloudflare Pages + Workers. but you could use whatever y
 ## tests
 we've got 80%+ coverage across the board using Vitest, React Testing Library, and MSW.
 `npm test`
+
+## license
+MIT, just do whatever you want. it's data served to the australian public anyway.
