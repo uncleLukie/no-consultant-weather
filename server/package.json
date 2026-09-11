@@ -14,13 +14,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
-    "@types/supertest": "^6.0.3",
-    "supertest": "^7.1.4",
-    "vitest": "^4.0.15"
+    "@types/supertest": "^7.2.1",
+    "supertest": "^7.2.2",
+    "vitest": "^5.0.0"
   }
 }

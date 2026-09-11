@@ -2,8 +2,8 @@ TN:
 SF:src\utils\geolocation.ts
 FN:19,getCurrentPosition
 FN:20,(anonymous_1)
-FN:27,(anonymous_2)
-FN:33,(anonymous_3)
+FN:26,(anonymous_2)
+FN:32,(anonymous_3)
 FN:66,calculateDistance
 FN:89,toRadians
 FN:97,findNearestRadars
