@@ -1,3 +1,86 @@
+// Polyfill standard ECMAScript Set methods for older Node environments (e.g. Node < 22)
+if (typeof (Set.prototype as any).intersection !== 'function') {
+  (Set.prototype as any).intersection = function <T>(this: Set<T>, other: Iterable<T>): Set<T> {
+    const otherSet = other instanceof Set ? other : new Set(other);
+    const result = new Set<T>();
+    for (const elem of this) {
+      if (otherSet.has(elem)) {
+        result.add(elem);
+      }
+    }
+    return result;
+  };
+}
+
+if (typeof (Set.prototype as any).difference !== 'function') {
+  (Set.prototype as any).difference = function <T>(this: Set<T>, other: Iterable<T>): Set<T> {
+    const otherSet = other instanceof Set ? other : new Set(other);
+    const result = new Set<T>();
+    for (const elem of this) {
+      if (!otherSet.has(elem)) {
+        result.add(elem);
+      }
+    }
+    return result;
+  };
+}
+
+if (typeof (Set.prototype as any).union !== 'function') {
+  (Set.prototype as any).union = function <T>(this: Set<T>, other: Iterable<T>): Set<T> {
+    const result = new Set<T>(this);
+    for (const elem of other) {
+      result.add(elem);
+    }
+    return result;
+  };
+}
+
+if (typeof (Set.prototype as any).isDisjointFrom !== 'function') {
+  (Set.prototype as any).isDisjointFrom = function <T>(this: Set<T>, other: Iterable<T>): boolean {
+    const otherSet = other instanceof Set ? other : new Set(other);
+    for (const elem of this) {
+      if (otherSet.has(elem)) return false;
+    }
+    return true;
+  };
+}
+
+if (typeof (Set.prototype as any).isSubsetOf !== 'function') {
+  (Set.prototype as any).isSubsetOf = function <T>(this: Set<T>, other: Iterable<T>): boolean {
+    const otherSet = other instanceof Set ? other : new Set(other);
+    if (this.size > (otherSet instanceof Set ? otherSet.size : Infinity)) return false;
+    for (const elem of this) {
+      if (!otherSet.has(elem)) return false;
+    }
+    return true;
+  };
+}
+
+if (typeof (Set.prototype as any).isSupersetOf !== 'function') {
+  (Set.prototype as any).isSupersetOf = function <T>(this: Set<T>, other: Iterable<T>): boolean {
+    const otherSet = other instanceof Set ? other : new Set(other);
+    for (const elem of otherSet) {
+      if (!this.has(elem)) return false;
+    }
+    return true;
+  };
+}
+
+if (typeof (Set.prototype as any).symmetricDifference !== 'function') {
+  (Set.prototype as any).symmetricDifference = function <T>(this: Set<T>, other: Iterable<T>): Set<T> {
+    const otherSet = other instanceof Set ? other : new Set(other);
+    const result = new Set<T>(this);
+    for (const elem of otherSet) {
+      if (result.has(elem)) {
+        result.delete(elem);
+      } else {
+        result.add(elem);
+      }
+    }
+    return result;
+  };
+}
+
 import '@testing-library/jest-dom';
 import { afterAll, afterEach, beforeAll } from 'vitest';
 import { cleanup } from '@testing-library/react';
