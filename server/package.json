@@ -15,12 +15,12 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.6",
-    "express": "^5.2.1",
+    "express": "^5.3.0",
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@types/supertest": "^7.2.1",
-    "supertest": "^7.2.2",
-    "vitest": "^5.0.0"
+    "supertest": "^7.3.1",
+    "vitest": "^5.0.5"
   }
 }
